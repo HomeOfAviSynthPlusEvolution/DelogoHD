@@ -183,7 +183,7 @@ public:
   // (DD * MAXDP + YC) / YDP
   // Right shift, then mm_store
   template <typename PIX>
-  void processImage(PIX* ptr, int stride, int maxwidth, int maxheight, int plane) {
+  void processImage(PIX* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity) {
     int * array_c, * array_d;
     int logox = logoheader.x;
     int logoy = logoheader.y;
@@ -219,10 +219,19 @@ public:
       for (int j = logox; j < logox + logow && j < maxwidth; j++) {
         int data = *cellptr;
         data <<= (16 - _ebpc);              // Left shift to 16 bit
-        data = (data * LOGO_MAX_DP + array_c[logocellpos]) / array_d[logocellpos];
+        int c = array_c[logocellpos];
+        int d = array_d[logocellpos];
+        if (opacity <= 1 - 1e-2) {
+          if (plane == PLANAR_Y)
+            c = YC2FadeYC(c, d, opacity);
+          else
+            c = CC2FadeCC(c, d, opacity);
+          d = static_cast<int>(LOGO_MAX_DP * 4 * (1 - opacity) + d * opacity);
+        }
+        data = (data * LOGO_MAX_DP + c) / d;
         data += 1 << (14 - _ebpc - 1);      // +0.5
         data >>= (14 - _ebpc);              // Right shift to original bitdepth
-        *cellptr = Clamp(data);  // Saturate downscale
+        *cellptr = Clamp(data);             // Saturate downscale
         cellptr++;
         logocellpos++;
       }
@@ -238,23 +247,67 @@ public:
   // m = 219/4096, n = 67584/4096
   // Y' = (Y * MAXDP + YC) / YDP
   int AUYC2YC(int auy_color, int auy_dp) {
-    const double m = 219.0 / 4096.0;
-    const double n = 16.5;
-    double maxdp_dp = LOGO_MAX_DP - auy_dp;
-    double offset = n * LOGO_MAX_DP + auy_color * auy_dp * m;
-    double bonus = n * maxdp_dp;
+    // Computing in <<12 and shift back >>4 later
+    const int m = 219;
+    const int n = 67584;
+    int maxdp_dp = LOGO_MAX_DP - auy_dp;
+    int offset = n * LOGO_MAX_DP + auy_color * auy_dp * m;
+    int bonus = n * maxdp_dp;
 
-    return static_cast<int>(round((bonus - offset) * 256.0));
+    return (bonus - offset) / 16;
+  }
+
+  int YC2FadeYC(int y_color, int y_dp, double opacity) {
+    // Computing in <<12 and shift back >>4 later
+    const int m = 219;
+    const int n = 67584;
+    if (opacity > 1 - 1e-2)
+      return y_color;
+    if (opacity < 1e-2)
+      return 0;
+
+    int auy_dp = LOGO_MAX_DP - y_dp / 4;
+    int bonus = n * y_dp / 4;
+    int offset = bonus - y_color * 16;
+    int cpm = offset - n * LOGO_MAX_DP;
+    cpm = static_cast<int>(cpm * opacity);
+
+    offset = n * LOGO_MAX_DP + cpm;
+    bonus = static_cast<int>(n * (LOGO_MAX_DP - auy_dp * opacity));
+
+    return (bonus - offset) / 16;
   }
 
   int AUCC2CC(int auc_color, int auc_dp) {
-    const double m = 7.0 / 128.0;
-    const double n = 128.5;
-    double maxdp_dp = LOGO_MAX_DP - auc_dp;
-    double offset = n * LOGO_MAX_DP + auc_color * auc_dp * m;
-    double bonus = n * maxdp_dp;
+    // Computing in <<8
+    const int m = 14;
+    const int n = 32896;
+    int maxdp_dp = LOGO_MAX_DP - auc_dp;
+    int offset = n * LOGO_MAX_DP + auc_color * auc_dp * m;
+    int bonus = n * maxdp_dp;
 
-    return static_cast<int>(round((bonus - offset) * 256.0));
+    return bonus - offset;
+  }
+
+  int CC2FadeCC(int c_color, int c_dp, double opacity) {
+    // Computing in <<8
+    const int m = 14;
+    const int n = 32896;
+    if (opacity > 1 - 1e-2)
+      return c_color;
+    if (opacity < 1e-2)
+      return 0;
+
+    int auc_dp = LOGO_MAX_DP - c_dp / 4;
+    int bonus = n * c_dp / 4;
+    int offset = bonus - c_color;
+    int cpm = offset - n * LOGO_MAX_DP;
+    cpm = static_cast<int>(cpm * opacity);
+
+    offset = n * LOGO_MAX_DP + cpm;
+    bonus = static_cast<int>(n * (LOGO_MAX_DP - auc_dp * opacity));
+
+    return bonus - offset;
   }
 
   inline unsigned char Clamp(int n) {

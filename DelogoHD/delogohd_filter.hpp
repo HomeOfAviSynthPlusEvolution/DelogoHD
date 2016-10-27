@@ -50,12 +50,28 @@ public:
       return src;
     if (left >= width(src, 0) || top >= height(src, 0))
       return src;
+    double opacity = fade(n);
+    if (opacity < 1e-2)
+      return src;
+
     auto dst = Dup(src);
-    engine->processImage(dst->GetWritePtr(PLANAR_Y), stride(dst, PLANAR_Y), width(dst, PLANAR_Y), height(dst, PLANAR_Y), PLANAR_Y);
-    engine->processImage(dst->GetWritePtr(PLANAR_U), stride(dst, PLANAR_U), width(dst, PLANAR_U), height(dst, PLANAR_U), PLANAR_U);
-    engine->processImage(dst->GetWritePtr(PLANAR_V), stride(dst, PLANAR_V), width(dst, PLANAR_V), height(dst, PLANAR_V), PLANAR_V);
+    engine->processImage(dst->GetWritePtr(PLANAR_Y), stride(dst, PLANAR_Y), width(dst, PLANAR_Y), height(dst, PLANAR_Y), PLANAR_Y, opacity);
+    engine->processImage(dst->GetWritePtr(PLANAR_U), stride(dst, PLANAR_U), width(dst, PLANAR_U), height(dst, PLANAR_U), PLANAR_U, opacity);
+    engine->processImage(dst->GetWritePtr(PLANAR_V), stride(dst, PLANAR_V), width(dst, PLANAR_V), height(dst, PLANAR_V), PLANAR_V, opacity);
 
     return dst;
+  }
+
+  double fade(int n) {
+    if (n < start || (end < n && end >= start)) { // Out of frame range
+      return 0;
+    }
+    if (n < start + fadein) // Fade in
+      return (n - start + 1.0) / fadein;
+    if (n > end - fadeout && end >= 0) // Fade out
+      return (end - n + 1.0) / fadeout;
+
+    return 1;
   }
 
 public:
