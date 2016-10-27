@@ -40,7 +40,7 @@ DelogoHD(clip, string logofile, ...)
     logofile           - lgd file, scanned by logoscan tool.
     logoname           - (optional) the name of the logo. (default = first found in file)
     start / end        - (optional) beginning / end of the logo, in frames. (default = 0 / -1)
-    fadein / fadeout   - ! NOT IMPLEMENTED YET ! (optional) fade in / out of the logo, in frames. (default = 0 / 0)
+    fadein / fadeout   - (optional) fade in / out of the logo, in frames. (default = 0 / 0)
     left / top         - (optional) adjust logo position, in pixels. (default = 0 / 0)
     mono   (new)       - (optional) skip chroma, may work better with monochrome logo. Use at your own risk. (default = false)
     cutoff (new)       - (optional) zerofill logo pixels whose alpha (depth) of luma is below cutoff. (default = 0)
@@ -55,6 +55,5 @@ DelogoHD("CCAV 3840x2160.lgd", start = 5, end =  95)
 ## Known issues
 
 * Does not support VapourSynth, yet
-* Does not support fading
 * Does not support delogo with negative left or top
 * Lack of SIMD optimization
