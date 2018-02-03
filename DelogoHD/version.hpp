@@ -1,3 +1,3 @@
 #pragma once
 
-#define PLUGIN_VERSION "r1"
+#define PLUGIN_VERSION "r2"

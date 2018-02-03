@@ -67,9 +67,9 @@ public:
       return 0;
     }
     if (n < start + fadein) // Fade in
-      return (n - start + 1.0) / fadein;
+      return (n - start + 0.5) / fadein;
     if (n > end - fadeout && end >= 0) // Fade out
-      return (end - n + 1.0) / fadeout;
+      return (end - n + 0.5) / fadeout;
 
     return 1;
   }
