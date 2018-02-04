@@ -35,13 +35,13 @@ public:
       throw("where's the video?");
     if (!(vi.IsYV12() || vi.IsYV16() || vi.IsYV24()))
       throw("only YV12, YV16, YV24 is supported.");
-    if (vi.width & 15)
+    if (width() & 15)
       throw("width is required to be mod-16");
-    if (vi.height & 1)
+    if (height() & 1)
       throw("height is required to be even");
     if (logofile == NULL)
       throw("where's the logo file?");
-    engine = new DelogoEngine(logofile, logoname, 8, ssw(), ssh(), left, top, mono, cutoff);
+    engine = new DelogoEngine(logofile, logoname, depth(), ssw(), ssh(), left, top, mono, cutoff);
   }
 
   virtual auto get(int n) -> decltype(Interface::get(n)) {
