@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "version.hpp"
 #include "wrapper/vs_filter.hpp"
+#include "version.hpp"
 #include "delogohd_filter.hpp"
 
 void VS_CC
 logoInit(VSMap *in, VSMap *out, void **instanceData, VSNode *node, VSCore *core, const VSAPI *vsapi)
 {
   VSFilter *d = *reinterpret_cast<VSFilter**>(instanceData);
-  vsapi->setVideoInfo(&d->vi, 1, node);
+  vsapi->setVideoInfo(&d->vi._vi, 1, node);
 }
 
 void VS_CC
@@ -36,26 +36,17 @@ logoGetFrame(int n, int activationReason, void **instanceData, void **frameData,
 
 static void VS_CC
 logoCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core, const VSAPI *vsapi) {
-  // int err;
-
-  // VSNodeRef * node = vsapi->propGetNode(in, "clip", 0, 0);
-  // VSVideoInfo * vi = new VSVideoInfo;
-  // *vi = *vsapi->getVideoInfo(node);
-
-  // FAIL_IF_ERROR(!vi->format || vi->width == 0 || vi->height == 0,
-  //   "clip must be constant format");
-
-  // FAIL_IF_ERROR(vi->format->sampleType != stInteger ||
-  //   vi->format->bitsPerSample != 8 ||
-  //   vi->format->colorFamily != cmYUV,
-  //   "only YUV420P8 input supported. You can you up.");
-
-  DelogoHDFilter<VSFilter> *data;
+  DelogoHDFilter<VSFilter> *data = nullptr;
 
   try {
     data = new DelogoHDFilter<VSFilter>(in, out, core, vsapi);
+    data->initialize();
     vsapi->createFilter(in, out, "DelogoHD", logoInit, logoGetFrame, logoFree, fmParallel, 0, data, core);
-  } catch (const char *) {
+  }
+  catch(const char *err){
+    char msg_buff[256];
+    snprintf(msg_buff, 256, "%s(" PLUGIN_VERSION "): %s", data ? data->name() : "DelogoHD", err);
+    vsapi->setError(out, msg_buff);
   }
 }
 

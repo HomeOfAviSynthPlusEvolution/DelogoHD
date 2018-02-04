@@ -1,91 +1,107 @@
 #include <VapourSynth.h>
 #include <VSHelper.h>
 
-class VSWrapperFrame : public WrapperFrame {
-protected:
-  VSCore *_core;
-  const VSAPI * _vsapi;
-  bool readonly;
-public:
-  VSFrameRef * _frame;
-  VSWrapperFrame(VSFrameRef * frame, VSCore *core, const VSAPI *vsapi)
-    : _core(core), _vsapi(vsapi), _frame(frame), readonly(false) {
-  }
-  VSWrapperFrame(const VSFrameRef * frame, VSCore *core, const VSAPI *vsapi)
-    : _core(core), _vsapi(vsapi), _frame((VSFrameRef*)frame), readonly(true) {
-  }
-  VSWrapperFrame* dup() {
-    return new VSWrapperFrame(_vsapi->copyFrame(_frame, _core), _core, _vsapi);
-  }
-  int stride(int plane = 0) const { return _vsapi->getStride(_frame, plane); }
-  int width (int plane = 0) const { return _vsapi->getFrameWidth(_frame, plane); }
-  int height(int plane = 0) const { return _vsapi->getFrameHeight(_frame, plane); }
-  unsigned char* writeptr(int plane = 0) const
-    { return _vsapi->getWritePtr(_frame, plane); }
-  const unsigned char* readptr(int plane = 0) const
-    { return _vsapi->getReadPtr(_frame, plane); }
-};
-
-class VSWrapperClip : public WrapperClip {
-protected:
-  VSCore *_core;
-  const VSAPI * _vsapi;
-public:
-  VSNodeRef * _clip;
-  VSVideoInfo _vi;
-  VSWrapperClip(VSNodeRef * clip, VSCore *core, const VSAPI *vsapi)
-    : _core(core), _vsapi(vsapi), _clip(clip) {
-    _vi = *_vsapi->getVideoInfo(_clip);
-  }
-  VSVideoInfo vi() {
-    return _vi;
-  }
-  VSWrapperFrame* getFrame(int n) {
-    return new VSWrapperFrame(_vsapi->getFrame(n, _clip, nullptr, 0), _core, _vsapi);
-  }
-
-  int width()     const { return _vi.width; }
-  int height()    const { return _vi.height; }
-  int ssw()       const { return _vi.format->subSamplingW; }
-  int ssh()       const { return _vi.format->subSamplingH; }
-  bool hasVideo() const { return _vi.format != nullptr; }
-  bool hasAudio() const { return false; } // Who cares?
-
-  bool isRGB()    const { return _vi.format->colorFamily == cmRGB; }
-  bool isYUV()    const { return _vi.format->colorFamily == cmYUV; }
-
-  bool isRGB24()  const { return isRGB(); } // Who cares?
-  bool isRGB32()  const { return isRGB(); } // Who cares?
-  bool isYV24()   const {
-    return isYUV()
-      && _vi.format->subSamplingW == 0
-      && _vi.format->subSamplingH == 0;
-  }
-  bool isYV16()   const {
-    return isYUV()
-      && _vi.format->subSamplingW == 1
-      && _vi.format->subSamplingH == 0;
-  }
-  bool isYV12()   const {
-    return isYUV()
-      && _vi.format->subSamplingW == 1
-      && _vi.format->subSamplingH == 1;
-  }
-  bool isY8()     const { return _vi.format->colorFamily == cmGray; }
-
-};
+#define PLANAR_Y 0
+#define PLANAR_U 1
+#define PLANAR_V 2
 
 class VSFilter {
-protected:
-  void initialize() {};
-  const char* name() const { return "VSFilter"; };
-  WrapperFrame* get(int n) {
-    return child->getFrame(n);
-  }
 
 public:
-  VSVideoInfo vi;
-  VSWrapperClip* child;
+  class AFrame {
+  protected:
+    VSCore *_core;
+    const VSAPI * _vsapi;
+    bool readonly;
+  public:
+    VSFrameRef * _frame;
+    VSVideoInfo _vi;
+    AFrame(VSFrameRef * frame, VSCore *core, const VSAPI *vsapi, VSVideoInfo vi)
+      : _core(core), _vsapi(vsapi), _vi(vi), _frame(frame), readonly(false) {
+    }
+    AFrame(const VSFrameRef * frame, VSCore *core, const VSAPI *vsapi, VSVideoInfo vi)
+      : _core(core), _vsapi(vsapi), _vi(vi), _frame((VSFrameRef*)frame), readonly(true) {
+    }
+    AFrame* dup() {
+      return new AFrame(_vsapi->copyFrame(_frame, _core), _core, _vsapi, _vi);
+    }
+    int stride(int plane = 0) const { return _vsapi->getStride(_frame, plane); }
+    int width (int plane = 0) const { return _vsapi->getFrameWidth(_frame, plane); }
+    int height(int plane = 0) const { return _vsapi->getFrameHeight(_frame, plane); }
+    unsigned char* GetWritePtr(int plane = 0) const
+      { return _vsapi->getWritePtr(_frame, plane); }
+    const unsigned char* GetReadPtr(int plane = 0) const
+      { return _vsapi->getReadPtr(_frame, plane); }
+  };
+
+  class AVideoInfo {
+  public:
+    VSVideoInfo _vi;
+    AVideoInfo() {}
+    AVideoInfo(VSVideoInfo vi)
+      : _vi(vi) {}
+    bool HasVideo() const { return _vi.format != nullptr; }
+    bool HasAudio() const { return false; } // Who cares?
+
+    bool IsRGB()    const { return _vi.format->colorFamily == cmRGB; }
+    bool IsYUV()    const { return _vi.format->colorFamily == cmYUV; }
+
+    bool IsRGB24()  const { return IsRGB(); } // Who cares?
+    bool IsRGB32()  const { return IsRGB(); } // Who cares?
+    bool IsYV24()   const {
+      return IsYUV()
+        && _vi.format->subSamplingW == 0
+        && _vi.format->subSamplingH == 0;
+    }
+    bool IsYV16()   const {
+      return IsYUV()
+        && _vi.format->subSamplingW == 1
+        && _vi.format->subSamplingH == 0;
+    }
+    bool IsYV12()   const {
+      return IsYUV()
+        && _vi.format->subSamplingW == 1
+        && _vi.format->subSamplingH == 1;
+    }
+    bool IsY8()     const { return _vi.format->colorFamily == cmGray; }
+  };
+
+  class AClip {
+  protected:
+    VSCore *_core;
+    const VSAPI * _vsapi;
+  public:
+    VSNodeRef * _clip;
+    VSVideoInfo _vi;
+    AClip(VSNodeRef * clip, VSCore *core, const VSAPI *vsapi)
+      : _core(core), _vsapi(vsapi), _clip(clip) {
+      _vi = *_vsapi->getVideoInfo(_clip);
+    }
+    AVideoInfo vi() {
+      return AVideoInfo(_vi);
+    }
+    AFrame* getFrame(int n) {
+      return new AFrame(_vsapi->getFrame(n, _clip, nullptr, 0), _core, _vsapi, _vi);
+    }
+
+    int width()     const { return _vi.width; }
+    int height()    const { return _vi.height; }
+    int ssw()       const { return _vi.format->subSamplingW; }
+    int ssh()       const { return _vi.format->subSamplingH; }
+  };
+
+  virtual AFrame* get(int n) {
+    return child->getFrame(n);
+  }
+  virtual void initialize() {}
+  virtual const char* name() const { return "VSFilter"; };
+
+protected:
+  int byte_per_channel; // Useless here
+  int bit_per_channel;  // Useless here
+public:
+  AVideoInfo vi;
+  AClip* child;
   const VSMap *_in;
   VSCore * _core;
   const VSAPI * _vsapi;
@@ -94,18 +110,9 @@ public:
     : _in(in), _core(core), _vsapi(vsapi) {
     child = ArgAsClip(0, "clip");
     vi = child->vi();
-    try {
-      initialize();
-    }
-    catch(const char *err){
-      char msg_buff[256];
-      snprintf(msg_buff, 256, "%s(" PLUGIN_VERSION "): %s", name(), err);
-      vsapi->setError(out, msg_buff);
-      throw(err);
-    }
   }
 
-  VSWrapperClip* ArgAsClip(int, const char* name) const { return new VSWrapperClip(_vsapi->propGetNode(_in, name, 0, 0), _core, _vsapi); }
+  AClip* ArgAsClip(int, const char* name) const { return new AClip(_vsapi->propGetNode(_in, name, 0, 0), _core, _vsapi); }
 
   bool ArgAsBool(int, const char* name) const {
     return ArgAsInt(0, name) != 0;
@@ -151,14 +158,31 @@ public:
     return data;
   }
 
+  // Clip
+  AFrame* GetFrame(AClip* clip, int n) {
+    return clip->getFrame(n);
+  }
+
+  // Frame
+  AFrame* Dup(AFrame* frame) {
+    return frame->dup();
+  }
+  int ssw() const { return vi._vi.format->subSamplingW; }
+  int ssh() const { return vi._vi.format->subSamplingH; }
+
+  int stride(AFrame* frame, int plane) const { return _vsapi->getStride(frame->_frame, plane); }
+  int width (AFrame* frame, int plane) const { return _vsapi->getFrameWidth(frame->_frame, plane); }
+  int height(AFrame* frame, int plane) const { return _vsapi->getFrameHeight(frame->_frame, plane); }
+  int width () const { return vi._vi.width;  }
+  int height() const { return vi._vi.height; }
+  int depth () const { return vi._vi.format->bitsPerSample; }
+
   void VS_CC GetFramePre(VSFrameContext *_frameCtx, VSCore *_core, const VSAPI *vsapi, int n) {
     vsapi->requestFrameFilter(n, child->_clip, _frameCtx);
   }
 
   const VSFrameRef *VS_CC GetFrame(VSFrameContext *_frameCtx, VSCore *_core, const VSAPI *vsapi, int n) {
-    auto frame = dynamic_cast<VSWrapperFrame*>(get(n));
+    auto frame = dynamic_cast<AFrame*>(get(n));
     return frame->_frame;
   }
-
-  typedef VSFrameRef * Wrapper;
 };
