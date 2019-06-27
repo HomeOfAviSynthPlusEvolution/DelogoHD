@@ -43,27 +43,28 @@ public:
     bool HasVideo() const { return _vi.format != nullptr; }
     bool HasAudio() const { return false; } // Who cares?
 
-    bool IsRGB()    const { return _vi.format->colorFamily == cmRGB; }
-    bool IsYUV()    const { return _vi.format->colorFamily == cmYUV; }
+    // bool IsRGB()    const { return _vi.format->colorFamily == cmRGB; }
+    // bool IsYUV()    const { return _vi.format->colorFamily == cmYUV; }
 
-    bool IsRGB24()  const { return IsRGB(); } // Who cares?
-    bool IsRGB32()  const { return IsRGB(); } // Who cares?
-    bool IsYV24()   const {
-      return IsYUV()
-        && _vi.format->subSamplingW == 0
-        && _vi.format->subSamplingH == 0;
-    }
-    bool IsYV16()   const {
-      return IsYUV()
-        && _vi.format->subSamplingW == 1
-        && _vi.format->subSamplingH == 0;
-    }
-    bool IsYV12()   const {
-      return IsYUV()
-        && _vi.format->subSamplingW == 1
-        && _vi.format->subSamplingH == 1;
-    }
-    bool IsY8()     const { return _vi.format->colorFamily == cmGray; }
+    // bool IsRGB24()  const { return IsRGB(); } // Who cares?
+    // bool IsRGB32()  const { return IsRGB(); } // Who cares?
+    // bool IsYV24()   const {
+    //   return IsYUV()
+    //     && _vi.format->subSamplingW == 0
+    //     && _vi.format->subSamplingH == 0;
+    // }
+    // bool IsYV16()   const {
+    //   return IsYUV()
+    //     && _vi.format->subSamplingW == 1
+    //     && _vi.format->subSamplingH == 0;
+    // }
+    // bool IsYV12()   const {
+    //   return IsYUV()
+    //     && _vi.format->subSamplingW == 1
+    //     && _vi.format->subSamplingH == 1;
+    // }
+    // bool IsY8()     const { return _vi.format->colorFamily == cmGray; }
+    int BitsPerComponent() const { return _vi.format->bitsPerSample; }
   };
 
   class AClip {
@@ -176,6 +177,13 @@ public:
   int width () const { return vi._vi.width;  }
   int height() const { return vi._vi.height; }
   int depth () const { return vi._vi.format->bitsPerSample; }
+
+  bool supported_pixel() const {
+    return vi._vi.format->colorFamily == cmYUV
+        && vi._vi.format->sampleType == stInteger
+        && vi._vi.format->bitsPerSample >= 8
+        && vi._vi.format->bitsPerSample <= 16;
+  }
 
   void VS_CC GetFramePre(VSFrameContext *_frameCtx, VSCore *_core, const VSAPI *vsapi, int n) {
     vsapi->requestFrameFilter(n, child->_clip, _frameCtx);

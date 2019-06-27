@@ -183,7 +183,7 @@ public:
   // (DD * MAXDP + YC) / YDP
   // Right shift, then mm_store
   template <typename PIX>
-  void processImage(PIX* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity) {
+  void processImage(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity) {
     int * array_c, * array_d;
     int logox = logoheader.x;
     int logoy = logoheader.y;
@@ -211,14 +211,14 @@ public:
     // TODO: check if left or top < 0
     // TODO: SIMD?
 
-    PIX* rowptr = ptr + stride * logoy;
+    unsigned char* rowptr = ptr + stride * logoy;
     int logorowpos = 0;
     for (int i = logoy; i < logoy + logoh && i < maxheight; i++) {
-      PIX* cellptr = rowptr + logox;
+      PIX* cellptr = (PIX*)(rowptr) + logox;
       int logocellpos = logorowpos;
       for (int j = logox; j < logox + logow && j < maxwidth; j++) {
         int data = *cellptr;
-        data <<= (16 - _ebpc);              // Left shift to 16 bit
+        data <<= (20 - _ebpc);              // Left shift to 20 bit
         int c = array_c[logocellpos];
         int d = array_d[logocellpos];
         if (opacity <= 1 - 1e-2) {
@@ -229,8 +229,8 @@ public:
           d = static_cast<int>(LOGO_MAX_DP * 4 * (1 - opacity) + d * opacity);
         }
         data = (data * LOGO_MAX_DP + c) / d;
-        data += 1 << (14 - _ebpc - 1);      // +0.5
-        data >>= (14 - _ebpc);              // Right shift to original bitdepth
+        data += 1 << (18 - _ebpc - 1);    // +0.5
+        data >>= (18 - _ebpc);              // Right shift to original bitdepth
         *cellptr = Clamp(data);             // Saturate downscale
         cellptr++;
         logocellpos++;
@@ -247,18 +247,18 @@ public:
   // m = 219/4096, n = 67584/4096
   // Y' = (Y * MAXDP + YC) / YDP
   int AUYC2YC(int auy_color, int auy_dp) {
-    // Computing in <<12 and shift back >>4 later
+    // Computing in <<12
     const int m = 219;
     const int n = 67584;
     int maxdp_dp = LOGO_MAX_DP - auy_dp;
     int offset = n * LOGO_MAX_DP + auy_color * auy_dp * m;
     int bonus = n * maxdp_dp;
 
-    return (bonus - offset) / 16;
+    return bonus - offset;
   }
 
   int YC2FadeYC(int y_color, int y_dp, double opacity) {
-    // Computing in <<12 and shift back >>4 later
+    // Computing in <<12
     const int m = 219;
     const int n = 67584;
     if (opacity > 1 - 1e-2)
@@ -268,29 +268,29 @@ public:
 
     int auy_dp = LOGO_MAX_DP - y_dp / 4;
     int bonus = n * y_dp / 4;
-    int offset = bonus - y_color * 16;
+    int offset = bonus - y_color;
     int cpm = offset - n * LOGO_MAX_DP;
     cpm = static_cast<int>(cpm * opacity);
 
     offset = n * LOGO_MAX_DP + cpm;
     bonus = static_cast<int>(n * (LOGO_MAX_DP - auy_dp * opacity));
 
-    return (bonus - offset) / 16;
+    return bonus - offset;
   }
 
   int AUCC2CC(int auc_color, int auc_dp) {
-    // Computing in <<8
+    // Computing in <<8, storing in <<12
     const int m = 14;
     const int n = 32896;
     int maxdp_dp = LOGO_MAX_DP - auc_dp;
     int offset = n * LOGO_MAX_DP + auc_color * auc_dp * m;
     int bonus = n * maxdp_dp;
 
-    return bonus - offset;
+    return (bonus - offset) * 16;
   }
 
   int CC2FadeCC(int c_color, int c_dp, double opacity) {
-    // Computing in <<8
+    // Computing in <<8, storing in <<12
     const int m = 14;
     const int n = 32896;
     if (opacity > 1 - 1e-2)
@@ -300,18 +300,19 @@ public:
 
     int auc_dp = LOGO_MAX_DP - c_dp / 4;
     int bonus = n * c_dp / 4;
-    int offset = bonus - c_color;
+    int offset = bonus - c_color / 16;
     int cpm = offset - n * LOGO_MAX_DP;
     cpm = static_cast<int>(cpm * opacity);
 
     offset = n * LOGO_MAX_DP + cpm;
     bonus = static_cast<int>(n * (LOGO_MAX_DP - auc_dp * opacity));
 
-    return bonus - offset;
+    return (bonus - offset) * 16;
   }
 
-  inline unsigned char Clamp(int n) {
-    n = n>255 ? 255 : n;
+  inline unsigned int Clamp(int n) {
+    int max = (1 << _ebpc)-1;
+    n = n>max ? max : n;
     return n<0 ? 0 : n;
   }
 };

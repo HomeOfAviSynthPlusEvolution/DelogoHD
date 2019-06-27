@@ -27,14 +27,14 @@ public:
     end     = ArgAsInt( 8, "end",     INT_MAX);
     mono    = ArgAsBool(9, "mono",    0);
     cutoff  = ArgAsInt(10, "cutoff",  0);
-    bit_per_channel = ArgAsInt(11, "input_depth", 8);
+    bit_per_channel = vi.BitsPerComponent();
     byte_per_channel = bit_per_channel > 8 ? 2 : 1;
 
     // Check input
     if (!vi.HasVideo())
       throw("where's the video?");
-    if (!(vi.IsYV12() || vi.IsYV16() || vi.IsYV24()))
-      throw("only YV12, YV16, YV24 is supported.");
+    if (!supported_pixel())
+      throw("pixel type is not supported");
     if (width() & 15)
       throw("width is required to be mod-16");
     if (height() & 1)
@@ -55,9 +55,19 @@ public:
       return src;
 
     auto dst = Dup(src);
-    engine->processImage(dst->GetWritePtr(PLANAR_Y), stride(dst, PLANAR_Y), width(dst, PLANAR_Y), height(dst, PLANAR_Y), PLANAR_Y, opacity);
-    engine->processImage(dst->GetWritePtr(PLANAR_U), stride(dst, PLANAR_U), width(dst, PLANAR_U), height(dst, PLANAR_U), PLANAR_U, opacity);
-    engine->processImage(dst->GetWritePtr(PLANAR_V), stride(dst, PLANAR_V), width(dst, PLANAR_V), height(dst, PLANAR_V), PLANAR_V, opacity);
+    if (byte_per_channel == 1)
+    {
+      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_Y), stride(dst, PLANAR_Y), width(dst, PLANAR_Y), height(dst, PLANAR_Y), PLANAR_Y, opacity);
+      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_U), stride(dst, PLANAR_U), width(dst, PLANAR_U), height(dst, PLANAR_U), PLANAR_U, opacity);
+      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_V), stride(dst, PLANAR_V), width(dst, PLANAR_V), height(dst, PLANAR_V), PLANAR_V, opacity);
+    }
+    else
+    {
+      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_Y), stride(dst, PLANAR_Y), width(dst, PLANAR_Y), height(dst, PLANAR_Y), PLANAR_Y, opacity);
+      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_U), stride(dst, PLANAR_U), width(dst, PLANAR_U), height(dst, PLANAR_U), PLANAR_U, opacity);
+      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_V), stride(dst, PLANAR_V), width(dst, PLANAR_V), height(dst, PLANAR_V), PLANAR_V, opacity);
+
+    }
 
     return dst;
   }
