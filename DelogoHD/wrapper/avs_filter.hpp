@@ -58,6 +58,20 @@ public:
   int width () const { return vi.width;  }
   int height() const { return vi.height; }
   int depth () const { return bit_per_channel; }
+  int supported_pixel() const {
+    return 
+      (
+        (vi.pixel_type & VideoInfo::CS_GENERIC_YUV420) == VideoInfo::CS_GENERIC_YUV420
+        || (vi.pixel_type & VideoInfo::CS_GENERIC_YUV422) == VideoInfo::CS_GENERIC_YUV422
+        || (vi.pixel_type & VideoInfo::CS_GENERIC_YUV444) == VideoInfo::CS_GENERIC_YUV444
+      ) && (
+        (vi.pixel_type & VideoInfo::CS_Sample_Bits_8) == VideoInfo::CS_Sample_Bits_8
+        || (vi.pixel_type & VideoInfo::CS_Sample_Bits_10) == VideoInfo::CS_Sample_Bits_10
+        || (vi.pixel_type & VideoInfo::CS_Sample_Bits_12) == VideoInfo::CS_Sample_Bits_12
+        || (vi.pixel_type & VideoInfo::CS_Sample_Bits_14) == VideoInfo::CS_Sample_Bits_14
+        || (vi.pixel_type & VideoInfo::CS_Sample_Bits_16) == VideoInfo::CS_Sample_Bits_16
+      );
+  }
 
   PVideoFrame __stdcall GetFrame(int n, IScriptEnvironment* env) {
     _env = env;
