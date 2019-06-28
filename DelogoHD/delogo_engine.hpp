@@ -60,6 +60,27 @@ public:
     convertLogo(data, mono);
   }
 
+  ~DelogoEngine(void)
+  {
+    for (int y = 0; y < logoheader.h; y++) {
+      _aligned_free(logo_yc[y]);
+      _aligned_free(logo_yd[y]);
+    }
+    int hstep = 1 << _hsubsampling;
+    for (int i = 0; i < logoheader.h / hstep; i++) {
+      _aligned_free(logo_uc[i]);
+      _aligned_free(logo_ud[i]);
+      _aligned_free(logo_vc[i]);
+      _aligned_free(logo_vd[i]);
+    }
+    delete[] logo_yc;
+    delete[] logo_yd;
+    delete[] logo_uc;
+    delete[] logo_ud;
+    delete[] logo_vc;
+    delete[] logo_vd;
+  }
+
   LOGO_PIXEL* readLogo(const char* logofile, const char* logoname) {
     if (logofile == NULL) throw "logo file not specified.";
     FILE* lfp;
@@ -367,6 +388,7 @@ public:
 
       rowptr += stride;
     }
+    _aligned_free(row_data);
   }
 
   // Old algorithm: AUY2Y((AUY * MAXDP - C * DP) / (MAXDP - DP) + 0.5)
