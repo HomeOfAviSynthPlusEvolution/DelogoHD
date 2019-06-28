@@ -367,6 +367,7 @@ public:
 
       rowptr += stride;
     }
+    _aligned_free(row_data);
   }
 
   // Old algorithm: AUY2Y((AUY * MAXDP - C * DP) / (MAXDP - DP) + 0.5)
