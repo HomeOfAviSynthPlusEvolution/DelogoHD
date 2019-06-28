@@ -1,6 +1,6 @@
 # DeLogoHD
 
-DelogoHD r0 Copyright(C) 2016 msg7086
+DelogoHD r3 Copyright(C) 2016-2019 msg7086
 
 "The" [delogo](https://github.com/makiuchi-d/delogo-avisynth) filter, which was originally written by [MakKi](https://github.com/makiuchi-d) many years ago, is now HD Remastered™! /joke
 
@@ -49,11 +49,10 @@ DelogoHD(clip, string logofile, ...)
 ## Example
 
 ```
-DelogoHD("CCAV 3840x2160.lgd", start = 5, end =  95)
+DelogoHD("CCAV 3840x2160.lgd", start = 5, end = 95)
 ```
 
 ## Known issues
 
 * Does not support VapourSynth, yet
 * Does not support delogo with negative left or top
-* Lack of SIMD optimization
