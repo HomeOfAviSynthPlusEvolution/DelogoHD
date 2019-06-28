@@ -35,8 +35,8 @@ public:
       throw("where's the video?");
     if (!supported_pixel())
       throw("pixel type is not supported");
-    if (width() & 15)
-      throw("width is required to be mod-16");
+    if (width() & 1)
+      throw("width is required to be even");
     if (height() & 1)
       throw("height is required to be even");
     if (logofile == NULL)
