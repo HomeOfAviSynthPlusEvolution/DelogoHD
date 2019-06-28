@@ -4,15 +4,49 @@
 #include <cstdio>
 #include <cmath>
 #include <cstring>
+#include <intrin.h>
 
 using namespace std;
+#define VSMIN(a,b) ((a) > (b) ? (b) : (a))
 
 class DelogoEngine {
 protected:
   LOGO_HEADER logoheader;
-  int* logo_yc, * logo_yd, * logo_uc, * logo_ud, * logo_vc, * logo_vd;
+  // Store ((1<<30) / real_value) for aligned_Xd
+  int** logo_yc, ** logo_yd, ** logo_uc, ** logo_ud, ** logo_vc, ** logo_vd;
   int _wsubsampling, _hsubsampling;
   int _ebpc, _cutoff;
+
+  __m128i _mm_shift_multiply_add(const __m128i data_p, const int leftshift, const __m128i &max_dp, const __m128i &data_c) {
+    // data <<= leftshift;
+    // data = (data * LOGO_MAX_DP + c);
+    __m128i data_ps = _mm_slli_epi32(data_p, leftshift);
+    data_ps = _mm_mullo_epi32(data_ps, max_dp);
+    data_ps = _mm_add_epi32(data_ps, data_c);
+    return data_ps;
+  }
+
+  __m128i _mm_multiply_shift(const __m128i data_p, const __m128i data_d, const __m128i &zero, const int rightshift) {
+    // We need to right shift 32 bits to restore it to 16 bit number, clamp it
+    // Then shift it down to final bit depth
+
+    const __m128i data_ph = _mm_unpackhi_epi32(data_p, zero);
+    const __m128i data_dh = _mm_unpackhi_epi32(data_d, zero);
+    const __m128i data_rh = _mm_mul_epu32(data_ph, data_dh);
+    const __m128i data_rhs = _mm_srli_epi64(data_rh, 32);
+
+    const __m128i data_pl = _mm_unpacklo_epi32(data_p, zero);
+    const __m128i data_dl = _mm_unpacklo_epi32(data_d, zero);
+    const __m128i data_rl = _mm_mul_epu32(data_pl, data_dl);
+    const __m128i data_rls = _mm_srli_epi64(data_rl, 32);
+
+    // We are at 16 bit depth, so it's safe to do saturate unsigned int 16 pack, clamp it to 0~2^16
+    const __m128i result_epu32 = _mm_packus_epi32(data_rls, data_rhs);
+    // Now shift it down to final bit depth
+    const __m128i result_epuXX = _mm_srli_epi32(result_epu32, rightshift);
+    return result_epuXX;
+  }
+
 public:
   DelogoEngine(const char* logofile, const char* logoname, int bitdepth, int wsubsampling, int hsubsampling, int left, int top, bool mono, int cutoff) :
     logo_yc(nullptr), logo_yd(nullptr),
@@ -110,35 +144,48 @@ public:
 
   void convertLogo(LOGO_PIXEL* data, bool mono) {
     // Y
-    int size = logoheader.w * logoheader.h;
-    logo_yc = new int[size];
-    logo_yd = new int[size];
-    for (int i = 0; i < size; i++) {
-      if (data[i].dp_y < _cutoff) {
-        data[i].dp_y = 0;
-        data[i].dp_cb = 0;
-        data[i].dp_cr = 0;
-      }
-      if (data[i].dp_y >= LOGO_MAX_DP)
-        data[i].dp_y = LOGO_MAX_DP - 1;
-      logo_yc[i] = AUYC2YC(data[i].y, data[i].dp_y);
-      logo_yd[i] = (LOGO_MAX_DP - data[i].dp_y) << 2;
-      if (mono) {
-        data[i].cb = data[i].cr = 0;
-        data[i].dp_cb = data[i].dp_cr = data[i].dp_y;
+    int aligned_w = logoheader.w + (0x3f & ~(logoheader.w-1)); // mod 64
+    logo_yc = new int*[logoheader.h];
+    logo_yd = new int*[logoheader.h];
+    for (int y = 0; y < logoheader.h; y++) {
+      logo_yc[y] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+      logo_yd[y] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+      for (int x = 0; x < logoheader.w; x++) {
+        int i = y * logoheader.w + x;
+        if (data[i].dp_y < _cutoff) {
+          data[i].dp_y = 0;
+          data[i].dp_cb = 0;
+          data[i].dp_cr = 0;
+        }
+        if (data[i].dp_y >= LOGO_MAX_DP)
+          data[i].dp_y = LOGO_MAX_DP - 1;
+        logo_yc[y][x] = AUYC2YC(data[i].y, data[i].dp_y);
+        logo_yd[y][x] = (1<<28) / (LOGO_MAX_DP - data[i].dp_y);
+        if (mono) {
+          data[i].cb = data[i].cr = 0;
+          data[i].dp_cb = data[i].dp_cr = data[i].dp_y;
+        }
       }
     }
 
     // UV
-    size >>= (_hsubsampling + _wsubsampling);
     int wstep = 1 << _wsubsampling;
     int hstep = 1 << _hsubsampling;
-    logo_uc = new int[size];
-    logo_ud = new int[size];
-    logo_vc = new int[size];
-    logo_vd = new int[size];
+    logo_uc = new int*[logoheader.h >> _hsubsampling];
+    logo_ud = new int*[logoheader.h >> _hsubsampling];
+    logo_vc = new int*[logoheader.h >> _hsubsampling];
+    logo_vd = new int*[logoheader.h >> _hsubsampling];
+    aligned_w = logoheader.w >> _wsubsampling;
+    aligned_w = aligned_w + (0x3f & ~(aligned_w-1)); // mod 64
     for (int i = 0; i < logoheader.h; i += hstep) {
+      int dstposy = i / hstep;
+      logo_uc[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+      logo_ud[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+      logo_vc[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+      logo_vd[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+
       for (int j = 0; j < logoheader.w; j += wstep) {
+        int dstposx = j / wstep;
         int uc = data[i * logoheader.w + j].cb;
         int ud = data[i * logoheader.w + j].dp_cb;
         int vc = data[i * logoheader.w + j].cr;
@@ -162,17 +209,16 @@ public:
           vd += data[(i+1) * logoheader.w + j + 1].dp_cr;
         }
 
-        int dstpos = (i * logoheader.w / hstep + j) / wstep;
-        logo_ud[dstpos] = (LOGO_MAX_DP << 2) - (ud << (2 - _wsubsampling - _hsubsampling));
-        logo_vd[dstpos] = (LOGO_MAX_DP << 2) - (vd << (2 - _wsubsampling - _hsubsampling));
+        logo_ud[dstposy][dstposx] = (1<<30) / ((LOGO_MAX_DP << 2) - (ud << (2 - _wsubsampling - _hsubsampling)));
+        logo_vd[dstposy][dstposx] = (1<<30) / ((LOGO_MAX_DP << 2) - (vd << (2 - _wsubsampling - _hsubsampling)));
 
         uc = uc / wstep / hstep;
         ud = ud / wstep / hstep;
         vc = vc / wstep / hstep;
         vd = vd / wstep / hstep;
 
-        logo_uc[dstpos] = AUCC2CC(uc, ud);
-        logo_vc[dstpos] = AUCC2CC(vc, vd);
+        logo_uc[dstposy][dstposx] = AUCC2CC(uc, ud);
+        logo_vc[dstposy][dstposx] = AUCC2CC(vc, vd);
       }
     }
   }
@@ -184,7 +230,7 @@ public:
   // Right shift, then mm_store
   template <typename PIX>
   void processImage(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity) {
-    int * array_c, * array_d;
+    int ** array_c, ** array_d;
     int logox = logoheader.x;
     int logoy = logoheader.y;
     int logow = logoheader.w;
@@ -212,31 +258,114 @@ public:
     // TODO: SIMD?
 
     unsigned char* rowptr = ptr + stride * logoy;
-    int logorowpos = 0;
-    for (int i = logoy; i < logoy + logoh && i < maxheight; i++) {
+
+    // For SIMD
+    int aligned_w = logow + (0x3f & ~(logow-1));
+    PIX* row_data = (PIX*)_aligned_malloc(aligned_w * sizeof(PIX), 64);
+    int pixel_max = (1 << _ebpc) - 1;
+    const int leftshift = (20 - _ebpc); // Left shift to 18 bit
+
+    for (int i = 0; i < logoh && i < maxheight - logoy; i++) {
       PIX* cellptr = (PIX*)(rowptr) + logox;
-      int logocellpos = logorowpos;
-      for (int j = logox; j < logox + logow && j < maxwidth; j++) {
-        int data = *cellptr;
-        data <<= (20 - _ebpc);              // Left shift to 20 bit
-        int c = array_c[logocellpos];
-        int d = array_d[logocellpos];
-        if (opacity <= 1 - 1e-2) {
+      int upbound = VSMIN(logow, maxwidth - logox);
+
+      if (opacity <= 1 - 1e-2) {
+        for (int j = 0; j < upbound; j++) {
+          int data = cellptr[j];
+          data <<= leftshift;
+          int c = array_c[i][j];
+          int d = (1<<30) / array_d[i][j];
           if (plane == PLANAR_Y)
             c = YC2FadeYC(c, d, opacity);
           else
             c = CC2FadeCC(c, d, opacity);
           d = static_cast<int>(LOGO_MAX_DP * 4 * (1 - opacity) + d * opacity);
+          data = (data * LOGO_MAX_DP + c) / d; // Max at 30 bit
+          data >>= (leftshift - 2);
+          cellptr[j] = Clamp(data, pixel_max);           // Saturate downscale
         }
-        data = (data * LOGO_MAX_DP + c) / d;
-        data += 1 << (18 - _ebpc - 1);    // +0.5
-        data >>= (18 - _ebpc);              // Right shift to original bitdepth
-        *cellptr = Clamp(data);             // Saturate downscale
-        cellptr++;
-        logocellpos++;
+      } else {
+        memcpy((void*)row_data, (void*)((PIX*)(rowptr) + logox), upbound * sizeof(PIX));
+        #ifdef PURE_C
+        for (int j = 0; j < upbound; j++) {
+          int data = row_data[j];
+          data <<= leftshift;
+          int c = array_c[i][j];
+          int d = (1<<30) / array_d[i][j];
+          data = (data * LOGO_MAX_DP + c) / d;
+          data >>= (leftshift - 2);
+          row_data[j] = Clamp(data, pixel_max);;
+        }
+        #else
+        auto zero = _mm_setzero_si128();
+        auto max_dp = _mm_set1_epi32(LOGO_MAX_DP);
+        if (sizeof(PIX) == 1)
+          for (int j = 0; j < upbound; j += 16) {
+            auto data = _mm_stream_load_si128((const __m128i *)(row_data+j));
+
+            auto data1_2 = _mm_unpacklo_epi8(data, zero);
+            auto data2_2 = _mm_unpackhi_epi8(data, zero);
+
+            auto data1_4 = _mm_unpacklo_epi16(data1_2, zero);
+            auto data2_4 = _mm_unpackhi_epi16(data1_2, zero);
+            auto data3_4 = _mm_unpacklo_epi16(data2_2, zero);
+            auto data4_4 = _mm_unpackhi_epi16(data2_2, zero);
+
+            __m128i data_c, data_d;
+
+            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j]));
+            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j]));
+            data1_4 = _mm_shift_multiply_add(data1_4, leftshift, max_dp, data_c);
+            data1_4 = _mm_multiply_shift(data1_4, data_d, zero, 16 - _ebpc);
+
+            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+4]));
+            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+4]));
+            data2_4 = _mm_shift_multiply_add(data2_4, leftshift, max_dp, data_c);
+            data2_4 = _mm_multiply_shift(data2_4, data_d, zero, 16 - _ebpc);
+
+            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+8]));
+            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+8]));
+            data3_4 = _mm_shift_multiply_add(data3_4, leftshift, max_dp, data_c);
+            data3_4 = _mm_multiply_shift(data3_4, data_d, zero, 16 - _ebpc);
+
+            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+12]));
+            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+12]));
+            data4_4 = _mm_shift_multiply_add(data4_4, leftshift, max_dp, data_c);
+            data4_4 = _mm_multiply_shift(data4_4, data_d, zero, 16 - _ebpc);
+
+            data1_2 = _mm_packus_epi32(data1_4, data2_4);
+            data2_2 = _mm_packus_epi32(data3_4, data4_4);
+            data = _mm_packus_epi16(data1_2, data2_2);
+            _mm_store_si128((__m128i *)(row_data+j), data);
+          }
+        else if (sizeof(PIX) == 2)
+          for (int j = 0; j < upbound; j += 8) {
+            auto data = _mm_stream_load_si128((const __m128i *)(row_data+j));
+
+            auto data1_2 = _mm_unpacklo_epi16(data, zero);
+            auto data2_2 = _mm_unpackhi_epi16(data, zero);
+
+            __m128i data_c, data_d;
+
+            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j]));
+            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j]));
+            data1_2 = _mm_shift_multiply_add(data1_2, leftshift, max_dp, data_c);
+            data1_2 = _mm_multiply_shift(data1_2, data_d, zero, 16 - _ebpc);
+
+            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+4]));
+            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+4]));
+            data2_2 = _mm_shift_multiply_add(data2_2, leftshift, max_dp, data_c);
+            data2_2 = _mm_multiply_shift(data2_2, data_d, zero, 16 - _ebpc);
+
+            data = _mm_packus_epi32(data1_2, data2_2);
+            _mm_store_si128((__m128i *)(row_data+j), data);
+          }
+        #endif
+
+        memcpy((void*)((PIX*)(rowptr) + logox), (void*)row_data, upbound * sizeof(PIX));
       }
+
       rowptr += stride;
-      logorowpos += logow;
     }
   }
 
@@ -310,8 +439,7 @@ public:
     return (bonus - offset) * 16;
   }
 
-  inline unsigned int Clamp(int n) {
-    int max = (1 << _ebpc)-1;
+  inline unsigned int Clamp(int n, const int max) {
     n = n>max ? max : n;
     return n<0 ? 0 : n;
   }
