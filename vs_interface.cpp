@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "wrapper/vs_filter.hpp"
 #include "version.hpp"
 #include "delogohd_filter.hpp"
