@@ -1,4 +1,5 @@
 #include "wrapper/avs_filter.hpp"
+#include "version.hpp"
 #include "delogohd_filter.hpp"
 
 AVSValue __cdecl CreateAVSFilter(AVSValue args, void* user_data, IScriptEnvironment* env)
@@ -8,7 +9,7 @@ AVSValue __cdecl CreateAVSFilter(AVSValue args, void* user_data, IScriptEnvironm
     filter->initialize();
   }
   catch (const char *err) {
-    env->ThrowError("%s: %s", filter->name(), err);
+    env->ThrowError("%s %s: %s", filter->name(), PLUGIN_VERSION, err);
   }
   return filter;
 }
