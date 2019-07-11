@@ -43,27 +43,6 @@ public:
     bool HasVideo() const { return _vi.format != nullptr; }
     bool HasAudio() const { return false; } // Who cares?
 
-    // bool IsRGB()    const { return _vi.format->colorFamily == cmRGB; }
-    // bool IsYUV()    const { return _vi.format->colorFamily == cmYUV; }
-
-    // bool IsRGB24()  const { return IsRGB(); } // Who cares?
-    // bool IsRGB32()  const { return IsRGB(); } // Who cares?
-    // bool IsYV24()   const {
-    //   return IsYUV()
-    //     && _vi.format->subSamplingW == 0
-    //     && _vi.format->subSamplingH == 0;
-    // }
-    // bool IsYV16()   const {
-    //   return IsYUV()
-    //     && _vi.format->subSamplingW == 1
-    //     && _vi.format->subSamplingH == 0;
-    // }
-    // bool IsYV12()   const {
-    //   return IsYUV()
-    //     && _vi.format->subSamplingW == 1
-    //     && _vi.format->subSamplingH == 1;
-    // }
-    // bool IsY8()     const { return _vi.format->colorFamily == cmGray; }
     int BitsPerComponent() const { return _vi.format->bitsPerSample; }
   };
 

@@ -7,7 +7,15 @@
 #include <intrin.h>
 
 using namespace std;
-#define VSMIN(a,b) ((a) > (b) ? (b) : (a))
+#define MATH_MIN(a,b) ((a) > (b) ? (b) : (a))
+
+// To support future AVX512, data needs be aligned.
+// Logo is 16 bit so mod-32 pixel padding is required.
+// Data is 8..16 bit so mod-64 pixel padding is required.
+// YUV420 has subsampling so 128 pixel padding is required.
+
+// However we are only supporting SSE4.1 right now.
+#define MIN_MODULO 32
 
 class DelogoEngine {
 protected:
@@ -57,7 +65,8 @@ public:
   {
     auto data = readLogo(logofile, logoname);
     data = shiftLogo(data, left, top);
-    convertLogo(data, mono);
+    if (data)
+      convertLogo(data, mono);
   }
 
   ~DelogoEngine(void)
@@ -123,54 +132,110 @@ public:
     return lgd;
   }
 
+  // Normalize logo to mod(MIN_MODULO), and cut any invisible part
   LOGO_PIXEL* shiftLogo(LOGO_PIXEL* data, int left, int top) {
-    int oldleft = logoheader.x + left;
-    int oldtop = logoheader.y + top;
+    int oldl = logoheader.x + left;
+    int oldt = logoheader.y + top;
+
+    // new left and top
+    int newl = oldl;
+    int newt = oldt;
+    // new width and height
     int neww = logoheader.w;
     int newh = logoheader.h;
+    // operation on top left corner of logo
+    int padl = 0;
+    int padt = 0;
 
-    // TODO: support delogo from negative position
-    if (oldleft < 0) oldleft = 0;
-    if (oldtop  < 0) oldtop  = 0;
+    // 1. Find new left and left padding.
+    // new left must be positive or zero.
+    // left padding can be negative, which will cut the logo.
 
-    // Align to mod16/mod2 boundary
-    int padleft = oldleft % 16;
-    int newleft = oldleft - padleft;
-    neww += padleft;
-    neww = neww + (16 - neww % 16) % 16;
+    if (oldl < 0) {
+      newl = 0;
+      padl = oldl;
+    } else if ((padl = oldl % MIN_MODULO) != 0)
+      newl = oldl - padl;
 
-    int padtop = oldtop % 2;
-    int newtop = oldtop - padtop;
-    newh += padtop;
-    newh = newh + newh % 2;
+    // 2. Find new top and top padding.
+    // vertical only needs mod-2
 
-    if (neww == logoheader.w && newh == logoheader.h)
+    if (oldt < 0) {
+      newt = 0;
+      padt = oldt;
+    } else if ((padt = oldt % 2) != 0)
+      newt = oldt + padt;
+
+    // 3. Pad width
+    neww += padl;
+    neww += ((MIN_MODULO-1) & ~(neww-1));
+
+    if (neww <= 0) {
+      delete data;
+      return NULL;
+    }
+
+    // 4. Pad height
+    newh += padt;
+    newh += newh % 2;
+
+    if (newh <= 0) {
+      delete data;
+      return NULL;
+    }
+
+    // 5. Copying logo data
+    if (newl == oldl && newt == oldt && neww == logoheader.w && newh == logoheader.h)
       return data;
 
+    int src_h, dst_h, len_h;
+    int src_v, dst_v, len_v;
+
+    if (padl >= 0) {
+      src_h = 0;
+      dst_h = padl;
+      len_h = logoheader.w;
+    } else {
+      src_h = -padl;
+      dst_h = 0;
+      len_h = logoheader.w + padl;
+    }
+
+    if (padt >= 0) {
+      src_v = 0;
+      dst_v = padt;
+      len_v = logoheader.h;
+    } else {
+      src_v = -padt;
+      dst_v = 0;
+      len_v = logoheader.h + padt;
+    }
+
     LOGO_PIXEL* lgd = new LOGO_PIXEL[neww * newh]();
-    for (int i = 0; i < logoheader.h; ++i) {
+    for (int i = 0; i < len_v; i++) {
       memcpy(
-        (void *)(lgd + padleft + (i + padtop) * neww),
-        (void *)(data + i * logoheader.w),
-        logoheader.w * sizeof(LOGO_PIXEL)
+        (void *)(lgd + dst_h + (i + dst_v) * neww),
+        (void *)(data + src_h + (i + src_v) * logoheader.w),
+        len_h * sizeof(LOGO_PIXEL)
       );
     }
+
+    // Done
     delete data;
     logoheader.w = neww;
     logoheader.h = newh;
-    logoheader.x = newleft;
-    logoheader.y = newtop;
+    logoheader.x = newl;
+    logoheader.y = newt;
     return lgd;
   }
 
   void convertLogo(LOGO_PIXEL* data, bool mono) {
     // Y
-    int aligned_w = logoheader.w + (0x3f & ~(logoheader.w-1)); // mod 64
     logo_yc = new int*[logoheader.h];
     logo_yd = new int*[logoheader.h];
     for (int y = 0; y < logoheader.h; y++) {
-      logo_yc[y] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
-      logo_yd[y] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+      logo_yc[y] = (int*)_aligned_malloc(logoheader.w * sizeof(int), MIN_MODULO);
+      logo_yd[y] = (int*)_aligned_malloc(logoheader.w * sizeof(int), MIN_MODULO);
       for (int x = 0; x < logoheader.w; x++) {
         int i = y * logoheader.w + x;
         if (data[i].dp_y < _cutoff) {
@@ -196,14 +261,13 @@ public:
     logo_ud = new int*[logoheader.h >> _hsubsampling];
     logo_vc = new int*[logoheader.h >> _hsubsampling];
     logo_vd = new int*[logoheader.h >> _hsubsampling];
-    aligned_w = logoheader.w >> _wsubsampling;
-    aligned_w = aligned_w + (0x3f & ~(aligned_w-1)); // mod 64
+    int aligned_w = logoheader.w >> _wsubsampling;
     for (int i = 0; i < logoheader.h; i += hstep) {
       int dstposy = i / hstep;
-      logo_uc[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
-      logo_ud[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
-      logo_vc[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
-      logo_vd[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), 64);
+      logo_uc[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), MIN_MODULO);
+      logo_ud[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), MIN_MODULO);
+      logo_vc[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), MIN_MODULO);
+      logo_vd[dstposy] = (int*)_aligned_malloc(aligned_w * sizeof(int), MIN_MODULO);
 
       for (int j = 0; j < logoheader.w; j += wstep) {
         int dstposx = j / wstep;
@@ -266,29 +330,30 @@ public:
       array_c = logo_vc;
       array_d = logo_vd;
     }
+    // Assuming it's no-op
+    if (array_c == nullptr && array_d == nullptr)
+      return;
+
+    if (array_c == nullptr || array_d == nullptr)
+      throw("Something wrong!");
+
     if (plane != PLANAR_Y) {
       logox >>= _wsubsampling;
       logow >>= _wsubsampling;
       logoy >>= _hsubsampling;
       logoh >>= _hsubsampling;
     }
-    if (array_c == nullptr || array_d == nullptr)
-      throw("Something wrong!");
-
-    // TODO: check if left or top < 0
-    // TODO: SIMD?
 
     unsigned char* rowptr = ptr + stride * logoy;
 
     // For SIMD
-    int aligned_w = logow + (0x3f & ~(logow-1));
-    PIX* row_data = (PIX*)_aligned_malloc(aligned_w * sizeof(PIX), 64);
     int pixel_max = (1 << _ebpc) - 1;
     const int leftshift = (20 - _ebpc); // Left shift to 18 bit
+    const int rightshift = (16 - _ebpc);
 
     for (int i = 0; i < logoh && i < maxheight - logoy; i++) {
       PIX* cellptr = (PIX*)(rowptr) + logox;
-      int upbound = VSMIN(logow, maxwidth - logox);
+      int upbound = MATH_MIN(logow, maxwidth - logox);
 
       if (opacity <= 1 - 1e-2) {
         for (int j = 0; j < upbound; j++) {
@@ -302,27 +367,28 @@ public:
             c = CC2FadeCC(c, d, opacity);
           d = static_cast<int>(LOGO_MAX_DP * 4 * (1 - opacity) + d * opacity);
           data = (data * LOGO_MAX_DP + c) / d; // Max at 30 bit
+          if (data < 0) data = 0;
           data >>= (leftshift - 2);
-          cellptr[j] = Clamp(data, pixel_max);           // Saturate downscale
+          cellptr[j] = MATH_MIN(data, pixel_max);           // Saturate downscale
         }
       } else {
-        memcpy((void*)row_data, (void*)((PIX*)(rowptr) + logox), upbound * sizeof(PIX));
         #ifdef PURE_C
         for (int j = 0; j < upbound; j++) {
-          int data = row_data[j];
+          int data = cellptr[j];
           data <<= leftshift;
           int c = array_c[i][j];
           int d = (1<<30) / array_d[i][j];
           data = (data * LOGO_MAX_DP + c) / d;
+          if (data < 0) data = 0;
           data >>= (leftshift - 2);
-          row_data[j] = Clamp(data, pixel_max);;
+          cellptr[j] = MATH_MIN(data, pixel_max);;
         }
         #else
         auto zero = _mm_setzero_si128();
         auto max_dp = _mm_set1_epi32(LOGO_MAX_DP);
         if (sizeof(PIX) == 1)
           for (int j = 0; j < upbound; j += 16) {
-            auto data = _mm_stream_load_si128((const __m128i *)(row_data+j));
+            auto data = _mm_stream_load_si128((__m128i *)(cellptr+j));
 
             auto data1_2 = _mm_unpacklo_epi8(data, zero);
             auto data2_2 = _mm_unpackhi_epi8(data, zero);
@@ -334,61 +400,88 @@ public:
 
             __m128i data_c, data_d;
 
-            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j]));
-            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j]));
+            data_c = _mm_stream_load_si128((__m128i *)(&array_c[i][j]));
+            data_d = _mm_stream_load_si128((__m128i *)(&array_d[i][j]));
             data1_4 = _mm_shift_multiply_add(data1_4, leftshift, max_dp, data_c);
-            data1_4 = _mm_multiply_shift(data1_4, data_d, zero, 16 - _ebpc);
+            data1_4 = _mm_max_epi16(data1_4, zero);
+            data1_4 = _mm_multiply_shift(data1_4, data_d, zero, rightshift);
 
-            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+4]));
-            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+4]));
+            data_c = _mm_stream_load_si128((__m128i *)(&array_c[i][j+4]));
+            data_d = _mm_stream_load_si128((__m128i *)(&array_d[i][j+4]));
             data2_4 = _mm_shift_multiply_add(data2_4, leftshift, max_dp, data_c);
-            data2_4 = _mm_multiply_shift(data2_4, data_d, zero, 16 - _ebpc);
+            data2_4 = _mm_max_epi16(data2_4, zero);
+            data2_4 = _mm_multiply_shift(data2_4, data_d, zero, rightshift);
 
-            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+8]));
-            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+8]));
+            data_c = _mm_stream_load_si128((__m128i *)(&array_c[i][j+8]));
+            data_d = _mm_stream_load_si128((__m128i *)(&array_d[i][j+8]));
             data3_4 = _mm_shift_multiply_add(data3_4, leftshift, max_dp, data_c);
-            data3_4 = _mm_multiply_shift(data3_4, data_d, zero, 16 - _ebpc);
+            data3_4 = _mm_max_epi16(data3_4, zero);
+            data3_4 = _mm_multiply_shift(data3_4, data_d, zero, rightshift);
 
-            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+12]));
-            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+12]));
+            data_c = _mm_stream_load_si128((__m128i *)(&array_c[i][j+12]));
+            data_d = _mm_stream_load_si128((__m128i *)(&array_d[i][j+12]));
             data4_4 = _mm_shift_multiply_add(data4_4, leftshift, max_dp, data_c);
-            data4_4 = _mm_multiply_shift(data4_4, data_d, zero, 16 - _ebpc);
+            data4_4 = _mm_max_epi16(data4_4, zero);
+            data4_4 = _mm_multiply_shift(data4_4, data_d, zero, rightshift);
 
             data1_2 = _mm_packus_epi32(data1_4, data2_4);
             data2_2 = _mm_packus_epi32(data3_4, data4_4);
             data = _mm_packus_epi16(data1_2, data2_2);
-            _mm_store_si128((__m128i *)(row_data+j), data);
+            if (j + 16 <= upbound)
+              _mm_store_si128((__m128i *)(cellptr+j), data);
+            else {
+              if (j + 8 <= upbound) {
+                _mm_storel_epi64((__m128i *)(cellptr+j), data);
+                j += 8;
+              }
+              if (j + 0 < upbound) cellptr[j + 0] = static_cast<PIX>(_mm_extract_epi8(data,  8));
+              if (j + 1 < upbound) cellptr[j + 1] = static_cast<PIX>(_mm_extract_epi8(data,  9));
+              if (j + 2 < upbound) cellptr[j + 2] = static_cast<PIX>(_mm_extract_epi8(data, 10));
+              if (j + 3 < upbound) cellptr[j + 3] = static_cast<PIX>(_mm_extract_epi8(data, 11));
+              if (j + 4 < upbound) cellptr[j + 4] = static_cast<PIX>(_mm_extract_epi8(data, 12));
+              if (j + 5 < upbound) cellptr[j + 5] = static_cast<PIX>(_mm_extract_epi8(data, 13));
+              if (j + 6 < upbound) cellptr[j + 6] = static_cast<PIX>(_mm_extract_epi8(data, 14));
+            }
           }
         else if (sizeof(PIX) == 2)
           for (int j = 0; j < upbound; j += 8) {
-            auto data = _mm_stream_load_si128((const __m128i *)(row_data+j));
+            auto data = _mm_stream_load_si128((__m128i *)(cellptr+j));
 
             auto data1_2 = _mm_unpacklo_epi16(data, zero);
             auto data2_2 = _mm_unpackhi_epi16(data, zero);
 
             __m128i data_c, data_d;
 
-            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j]));
-            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j]));
+            data_c = _mm_stream_load_si128((__m128i *)(&array_c[i][j]));
+            data_d = _mm_stream_load_si128((__m128i *)(&array_d[i][j]));
             data1_2 = _mm_shift_multiply_add(data1_2, leftshift, max_dp, data_c);
-            data1_2 = _mm_multiply_shift(data1_2, data_d, zero, 16 - _ebpc);
+            data1_2 = _mm_max_epi16(data1_2, zero);
+            data1_2 = _mm_multiply_shift(data1_2, data_d, zero, rightshift);
 
-            data_c = _mm_stream_load_si128((const __m128i *)(&array_c[i][j+4]));
-            data_d = _mm_stream_load_si128((const __m128i *)(&array_d[i][j+4]));
+            data_c = _mm_stream_load_si128((__m128i *)(&array_c[i][j+4]));
+            data_d = _mm_stream_load_si128((__m128i *)(&array_d[i][j+4]));
             data2_2 = _mm_shift_multiply_add(data2_2, leftshift, max_dp, data_c);
-            data2_2 = _mm_multiply_shift(data2_2, data_d, zero, 16 - _ebpc);
+            data2_2 = _mm_max_epi16(data2_2, zero);
+            data2_2 = _mm_multiply_shift(data2_2, data_d, zero, rightshift);
 
             data = _mm_packus_epi32(data1_2, data2_2);
-            _mm_store_si128((__m128i *)(row_data+j), data);
+            if (j + 8 <= upbound)
+              _mm_store_si128((__m128i *)(cellptr+j), data);
+            else {
+              if (j + 4 <= upbound) {
+                _mm_storel_epi64((__m128i *)(cellptr+j), data);
+                j += 4;
+              }
+              if (j + 0 < upbound) cellptr[j + 0] = static_cast<PIX>(_mm_extract_epi16(data, 4));
+              if (j + 1 < upbound) cellptr[j + 1] = static_cast<PIX>(_mm_extract_epi16(data, 5));
+              if (j + 2 < upbound) cellptr[j + 2] = static_cast<PIX>(_mm_extract_epi16(data, 6));
+            }
           }
         #endif
-
-        memcpy((void*)((PIX*)(rowptr) + logox), (void*)row_data, upbound * sizeof(PIX));
       }
 
       rowptr += stride;
     }
-    _aligned_free(row_data);
   }
 
   // Old algorithm: AUY2Y((AUY * MAXDP - C * DP) / (MAXDP - DP) + 0.5)
@@ -459,10 +552,5 @@ public:
     bonus = static_cast<int>(n * (LOGO_MAX_DP - auc_dp * opacity));
 
     return (bonus - offset) * 16;
-  }
-
-  inline unsigned int Clamp(int n, const int max) {
-    n = n>max ? max : n;
-    return n<0 ? 0 : n;
   }
 };
