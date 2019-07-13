@@ -1,7 +1,8 @@
 #include "delogo_engine.hpp"
 
 // using namespace std;
-LOGO_PIXEL* DelogoEngine::readLogo(const char* logofile, const char* logoname) {
+template <EOperation EOP>
+LOGO_PIXEL* DelogoEngine<EOP>::readLogo(const char* logofile, const char* logoname) {
   if (logofile == NULL) throw "logo file not specified.";
   FILE* lfp;
   fopen_s(&lfp, logofile, "rb");
@@ -44,7 +45,8 @@ LOGO_PIXEL* DelogoEngine::readLogo(const char* logofile, const char* logoname) {
 }
 
 // Normalize logo to mod(MIN_MODULO), and cut any invisible part
-LOGO_PIXEL* DelogoEngine::shiftLogo(LOGO_PIXEL* data, int left, int top) {
+template <EOperation EOP>
+LOGO_PIXEL* DelogoEngine<EOP>::shiftLogo(LOGO_PIXEL* data, int left, int top) {
   int oldl = logoheader.x + left;
   int oldt = logoheader.y + top;
 
@@ -140,7 +142,8 @@ LOGO_PIXEL* DelogoEngine::shiftLogo(LOGO_PIXEL* data, int left, int top) {
   return lgd;
 }
 
-void DelogoEngine::convertLogo(LOGO_PIXEL* data, bool mono) {
+template <EOperation EOP>
+void DelogoEngine<EOP>::convertLogo(LOGO_PIXEL* data, bool mono) {
   // Y
   logo_yc = new int*[logoheader.h];
   logo_yd = new int*[logoheader.h];
@@ -157,7 +160,10 @@ void DelogoEngine::convertLogo(LOGO_PIXEL* data, bool mono) {
       if (data[i].dp_y >= LOGO_MAX_DP)
         data[i].dp_y = LOGO_MAX_DP - 1;
       logo_yc[y][x] = AUYC2YC(data[i].y, data[i].dp_y);
-      logo_yd[y][x] = (1<<28) / (LOGO_MAX_DP - data[i].dp_y);
+      if (EOP == ERASE_LOGO)
+        logo_yd[y][x] = (1<<28) / (LOGO_MAX_DP - data[i].dp_y);
+      else
+        logo_yd[y][x] = (LOGO_MAX_DP - data[i].dp_y) << 2;
       if (mono) {
         data[i].cb = data[i].cr = 0;
         data[i].dp_cb = data[i].dp_cr = data[i].dp_y;
@@ -205,8 +211,13 @@ void DelogoEngine::convertLogo(LOGO_PIXEL* data, bool mono) {
         vd += data[(i+1) * logoheader.w + j + 1].dp_cr;
       }
 
-      logo_ud[dstposy][dstposx] = (1<<30) / ((LOGO_MAX_DP << 2) - (ud << (2 - _wsubsampling - _hsubsampling)));
-      logo_vd[dstposy][dstposx] = (1<<30) / ((LOGO_MAX_DP << 2) - (vd << (2 - _wsubsampling - _hsubsampling)));
+      if (EOP == ERASE_LOGO) {
+        logo_ud[dstposy][dstposx] = (1<<30) / ((LOGO_MAX_DP << 2) - (ud << (2 - _wsubsampling - _hsubsampling)));
+        logo_vd[dstposy][dstposx] = (1<<30) / ((LOGO_MAX_DP << 2) - (vd << (2 - _wsubsampling - _hsubsampling)));
+      } else {
+        logo_ud[dstposy][dstposx] = (LOGO_MAX_DP << 2) - (ud << (2 - _wsubsampling - _hsubsampling));
+        logo_vd[dstposy][dstposx] = (LOGO_MAX_DP << 2) - (vd << (2 - _wsubsampling - _hsubsampling));
+      }
 
       uc = uc / wstep / hstep;
       ud = ud / wstep / hstep;
@@ -218,3 +229,17 @@ void DelogoEngine::convertLogo(LOGO_PIXEL* data, bool mono) {
     }
   }
 }
+
+template
+LOGO_PIXEL* DelogoEngine<ADD_LOGO>::readLogo(const char* logofile, const char* logoname);
+template
+LOGO_PIXEL* DelogoEngine<ADD_LOGO>::shiftLogo(LOGO_PIXEL* data, int left, int top);
+template
+void DelogoEngine<ADD_LOGO>::convertLogo(LOGO_PIXEL* data, bool mono);
+
+template
+LOGO_PIXEL* DelogoEngine<ERASE_LOGO>::readLogo(const char* logofile, const char* logoname);
+template
+LOGO_PIXEL* DelogoEngine<ERASE_LOGO>::shiftLogo(LOGO_PIXEL* data, int left, int top);
+template
+void DelogoEngine<ERASE_LOGO>::convertLogo(LOGO_PIXEL* data, bool mono);

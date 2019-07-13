@@ -31,12 +31,13 @@ logoGetFrame(int n, int activationReason, void **instanceData, void **frameData,
   return d->GetFrame(frameCtx, core, vsapi, n);
 }
 
+template <EOperation EOP>
 static void VS_CC
 logoCreate(const VSMap *in, VSMap *out, void *userData, VSCore *core, const VSAPI *vsapi) {
-  DelogoHDFilter<VSFilter> *data = nullptr;
+  DelogoHDFilter<VSFilter, EOP> *data = nullptr;
 
   try {
-    data = new DelogoHDFilter<VSFilter>(in, out, core, vsapi);
+    data = new DelogoHDFilter<VSFilter, EOP>(in, out, core, vsapi);
     data->initialize();
     vsapi->createFilter(in, out, "DelogoHD", logoInit, logoGetFrame, logoFree, fmParallel, 0, data, core);
   }
@@ -66,5 +67,6 @@ VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegisterFunction registerFunc
     "mono:int:opt;"
     "cutoff:int:opt;"
     ;
-  registerFunc("DelogoHD", options, logoCreate, nullptr, plugin);
+  registerFunc("DelogoHD", options, logoCreate<ERASE_LOGO>, nullptr, plugin);
+  registerFunc("AddlogoHD", options, logoCreate<ADD_LOGO>, nullptr, plugin);
 }

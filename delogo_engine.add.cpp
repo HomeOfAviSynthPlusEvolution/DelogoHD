@@ -3,9 +3,9 @@
 using namespace std;
 #define MATH_MIN(a,b) ((a) > (b) ? (b) : (a))
 
-// (DD * MAXDP + YC) / YDP
+// (DD * YDP - YC) / MAXDP
 template <> template <typename PIX>
-void DelogoEngine<ERASE_LOGO>::processImage(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity) {
+void DelogoEngine<ADD_LOGO>::processImage(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity) {
   int ** array_c, ** array_d;
   int logox = logoheader.x;
   int logoy = logoheader.y;
@@ -38,7 +38,7 @@ void DelogoEngine<ERASE_LOGO>::processImage(unsigned char* ptr, int stride, int 
   unsigned char* rowptr = ptr + stride * logoy;
 
   const int pixel_max = (1 << _ebpc) - 1;
-  const int shift = (20 - _ebpc);
+  const int shift = (18 - _ebpc);
 
   int upbound = MATH_MIN(logow, maxwidth - logox);
 
@@ -50,15 +50,15 @@ void DelogoEngine<ERASE_LOGO>::processImage(unsigned char* ptr, int stride, int 
         int data = cellptr[j];
         data <<= shift;
         int c = array_c[i][j];
-        int d = (1<<30) / array_d[i][j];
+        int d = array_d[i][j];
         if (plane == 0)
           c = YC2FadeYC(c, d, opacity);
         else
           c = CC2FadeCC(c, d, opacity);
         d = static_cast<int>(LOGO_MAX_DP * 4 * (1 - opacity) + d * opacity);
-        data = (data * LOGO_MAX_DP + c) / d;
+        data = (data * d - c) / LOGO_MAX_DP;
         if (data < 0) data = 0;
-        data >>= shift - 4;
+        data >>= shift;
         data++;
         data >>= 2;
         cellptr[j] = MATH_MIN(data, pixel_max);
@@ -76,10 +76,10 @@ void DelogoEngine<ERASE_LOGO>::processImage(unsigned char* ptr, int stride, int 
       int64_t data = cellptr[j];
       data <<= shift;
       int64_t c = array_c[i][j];
-      int64_t d = (1<<30) / array_d[i][j];
-      data = (data * LOGO_MAX_DP + c) / d;
+      int64_t d = array_d[i][j];
+      data = (data * d - c) / LOGO_MAX_DP;
       if (data < 0) data = 0;
-      data >>= shift - 4;
+      data >>= shift;
       data++;
       data >>= 2;
       cellptr[j] = MATH_MIN(data, pixel_max);
@@ -93,7 +93,7 @@ void DelogoEngine<ERASE_LOGO>::processImage(unsigned char* ptr, int stride, int 
 }
 
 template
-void DelogoEngine<ERASE_LOGO>::processImage<uint8_t>(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity);
+void DelogoEngine<ADD_LOGO>::processImage<uint8_t>(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity);
 
 template
-void DelogoEngine<ERASE_LOGO>::processImage<uint16_t>(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity);
+void DelogoEngine<ADD_LOGO>::processImage<uint16_t>(unsigned char* ptr, int stride, int maxwidth, int maxheight, int plane, double opacity);

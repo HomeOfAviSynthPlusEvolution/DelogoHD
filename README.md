@@ -13,9 +13,11 @@ This filter provides both AviSynth+ and VapourSynth interfaces. It compiles unde
 ```python
 # AviSynth+
 DelogoHD(clip, "CCAV 3840x2160.lgd", start = 5, end = 95, fadein = 2, mono = true, cutoff = 5)
+AddlogoHD(clip, "CCAV 3840x2160.lgd", start = 5, end = 95, fadein = 2, mono = true, cutoff = 5)
 
 # VapourSynth
 delogohd.DelogoHD(clip, "CCAV 3840x2160.lgd", start = 5, end = 95, fadein = 2, mono = True, cutoff = 5)
+delogohd.AddlogoHD(clip, "CCAV 3840x2160.lgd", start = 5, end = 95, fadein = 2, mono = True, cutoff = 5)
 ```
 
 

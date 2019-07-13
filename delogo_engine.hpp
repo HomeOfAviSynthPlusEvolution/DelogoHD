@@ -18,6 +18,9 @@ using namespace std;
 // However we are only supporting SSE4.1 right now.
 #define MIN_MODULO 32
 
+enum EOperation { ADD_LOGO, ERASE_LOGO };
+
+template <EOperation EOP>
 class DelogoEngine {
 protected:
   LOGO_HEADER logoheader;

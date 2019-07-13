@@ -3,7 +3,7 @@
 #include <climits>
 #include "delogo_engine.hpp"
 
-template <typename Interface>
+template <typename Interface, EOperation EOP>
 class DelogoHDFilter: public Interface {
 
 protected:
@@ -12,7 +12,7 @@ protected:
   int left, top;
   bool mono;
   int cutoff;
-  DelogoEngine* engine;
+  DelogoEngine<EOP>* engine;
 
 public:
   virtual const char* name() const { return "DelogoHD"; }
@@ -37,7 +37,7 @@ public:
       throw("pixel type is not supported");
     if (logofile == NULL)
       throw("where's the logo file?");
-    engine = new DelogoEngine(logofile, logoname, this->depth(), this->ssw(), this->ssh(), left, top, mono, cutoff);
+    engine = new DelogoEngine<EOP>(logofile, logoname, this->depth(), this->ssw(), this->ssh(), left, top, mono, cutoff);
   }
 
   virtual auto get(int n) -> decltype(Interface::get(n)) {
@@ -53,15 +53,15 @@ public:
     auto dst = this->Dup(src);
     if (this->byte_per_channel == 1)
     {
-      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), 0, opacity);
-      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), 1, opacity);
-      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), 2, opacity);
+      engine->template processImage<uint8_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), 0, opacity);
+      engine->template processImage<uint8_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), 1, opacity);
+      engine->template processImage<uint8_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), 2, opacity);
     }
     else
     {
-      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), 0, opacity);
-      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), 1, opacity);
-      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), 2, opacity);
+      engine->template processImage<uint16_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), 0, opacity);
+      engine->template processImage<uint16_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), 1, opacity);
+      engine->template processImage<uint16_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), 2, opacity);
 
     }
 
