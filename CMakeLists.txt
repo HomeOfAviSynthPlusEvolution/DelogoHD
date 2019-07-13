@@ -3,7 +3,7 @@ project (DelogoHD)
 file(GLOB API_FILES ${PROJECT_SOURCE_DIR}/*_interface.cpp)
 file(GLOB CORE_FILES ${PROJECT_SOURCE_DIR}/delogo_engine.*.cpp)
 add_library(DelogoHD SHARED ${API_FILES} ${CORE_FILES} version.rc)
-set (VERSION "r6")
+set (VERSION "r7")
 configure_file (
   "${PROJECT_SOURCE_DIR}/version.hpp.in"
   "${PROJECT_SOURCE_DIR}/version.hpp"
