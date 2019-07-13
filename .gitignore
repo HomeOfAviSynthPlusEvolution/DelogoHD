@@ -274,3 +274,5 @@ __pycache__/
 version.hpp
 *.sln
 *.vcxproj
+
+build/*
