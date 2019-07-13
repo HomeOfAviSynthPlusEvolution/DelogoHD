@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.1)
 project (DelogoHD)
-add_library(DelogoHD SHARED avs_interface.cpp vs_interface.cpp version.rc)
+file(GLOB API_FILES ${PROJECT_SOURCE_DIR}/*_interface.cpp)
+file(GLOB CORE_FILES ${PROJECT_SOURCE_DIR}/delogo_engine.*.cpp)
+add_library(DelogoHD SHARED ${API_FILES} ${CORE_FILES} version.rc)
 set (VERSION "r6")
 configure_file (
   "${PROJECT_SOURCE_DIR}/version.hpp.in"

@@ -53,15 +53,15 @@ public:
     auto dst = this->Dup(src);
     if (this->byte_per_channel == 1)
     {
-      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), PLANAR_Y, opacity);
-      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), PLANAR_U, opacity);
-      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), PLANAR_V, opacity);
+      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), 0, opacity);
+      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), 1, opacity);
+      engine->processImage<uint8_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), 2, opacity);
     }
     else
     {
-      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), PLANAR_Y, opacity);
-      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), PLANAR_U, opacity);
-      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), PLANAR_V, opacity);
+      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_Y), this->stride(dst, PLANAR_Y), this->width(dst, PLANAR_Y), this->height(dst, PLANAR_Y), 0, opacity);
+      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_U), this->stride(dst, PLANAR_U), this->width(dst, PLANAR_U), this->height(dst, PLANAR_U), 1, opacity);
+      engine->processImage<uint16_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), 2, opacity);
 
     }
 
