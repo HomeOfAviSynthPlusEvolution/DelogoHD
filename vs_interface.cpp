@@ -53,6 +53,18 @@ VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegisterFunction registerFunc
   configFunc("in.7086.delogohd", "delogohd",
     "VapourSynth DelogoHD Filter " PLUGIN_VERSION,
     VAPOURSYNTH_API_VERSION, 1, plugin);
-  const char * options = "clip:clip;logofile:data;logoname:data:opt;left:int:opt;top:int:opt;start:int:opt;end:int:opt;fadein:int:opt;fadeout:int:opt;";
+  const char * options =
+    "clip:clip;"
+    "logofile:data;"
+    "logoname:data:opt;"
+    "left:int:opt;"
+    "top:int:opt;"
+    "start:int:opt;"
+    "end:int:opt;"
+    "fadein:int:opt;"
+    "fadeout:int:opt;"
+    "mono:int:opt;"
+    "cutoff:int:opt;"
+    ;
   registerFunc("DelogoHD", options, logoCreate, nullptr, plugin);
 }

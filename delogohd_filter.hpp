@@ -22,9 +22,9 @@ public:
     left    = this->ArgAsInt( 3, "left",    0);
     top     = this->ArgAsInt( 4, "top",     0);
     start   = this->ArgAsInt( 5, "start",   0);
-    fadein  = this->ArgAsInt( 6, "fadein",  0);
-    fadeout = this->ArgAsInt( 7, "fadeout", 0);
-    end     = this->ArgAsInt( 8, "end",     INT_MAX);
+    end     = this->ArgAsInt( 6, "end",     INT_MAX);
+    fadein  = this->ArgAsInt( 7, "fadein",  0);
+    fadeout = this->ArgAsInt( 8, "fadeout", 0);
     mono    = this->ArgAsBool(9, "mono",    0);
     cutoff  = this->ArgAsInt(10, "cutoff",  0);
     this->bit_per_channel = this->vi.BitsPerComponent();
