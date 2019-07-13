@@ -30,7 +30,7 @@ public:
     int height(int plane = 0) const { return _vsapi->getFrameHeight(_frame, plane); }
     unsigned char* GetWritePtr(int plane = 0) const
       { return _vsapi->getWritePtr(_frame, plane); }
-    const unsigned char* GetReadPtr(int plane = 0) const
+    const unsigned char* GetReadPtr(int plane = 0)
       { return _vsapi->getReadPtr(_frame, plane); }
   };
 

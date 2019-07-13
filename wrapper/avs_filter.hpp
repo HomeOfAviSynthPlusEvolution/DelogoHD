@@ -52,9 +52,9 @@ public:
   int ssh() const { return vi.GetPlaneHeightSubsampling(PLANAR_U); }
 
 
-  int stride(PVideoFrame frame, int plane) const { return frame->GetPitch(plane); }
-  int width (PVideoFrame frame, int plane) const { return frame->GetRowSize(plane) / byte_per_channel; }
-  int height(PVideoFrame frame, int plane) const { return frame->GetHeight(plane); }
+  int stride(PVideoFrame& frame, int plane) const { return frame->GetPitch(plane); }
+  int width (PVideoFrame& frame, int plane) const { return frame->GetRowSize(plane) / byte_per_channel; }
+  int height(PVideoFrame& frame, int plane) const { return frame->GetHeight(plane); }
   int width () const { return vi.width;  }
   int height() const { return vi.height; }
   int depth () const { return bit_per_channel; }
