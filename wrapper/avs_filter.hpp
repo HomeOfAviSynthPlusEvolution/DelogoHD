@@ -45,7 +45,7 @@ public:
 
   // Frame
   PVideoFrame Dup(PVideoFrame frame) {
-    bool s = _env->MakeWritable(&frame);
+    _env->MakeWritable(&frame);
     return frame;
   }
   int ssw() const { return vi.GetPlaneWidthSubsampling(PLANAR_U); }

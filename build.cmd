@@ -1,15 +1,26 @@
 @echo off
 
-mkdir build\x86
-pushd build\x86
-cmake -DCMAKE_GENERATOR_PLATFORM=Win32 -D_DIR=x86 ..\..\
+mkdir build\msvc-x86
+pushd build\msvc-x86
+cmake -DCMAKE_GENERATOR_PLATFORM=Win32 -D_DIR=msvc-x86 ..\..\
 popd
-mkdir build\x64
-pushd build\x64
-cmake -DCMAKE_GENERATOR_PLATFORM=x64 -D_DIR=x64 ..\..\
+mkdir build\msvc-x64
+pushd build\msvc-x64
+cmake -DCMAKE_GENERATOR_PLATFORM=x64 -D_DIR=msvc-x64 ..\..\
 popd
-cmake --build build\x86 --config Release
-cmake --build build\x64 --config Release
+cmake --build build\msvc-x86 --config Release
+cmake --build build\msvc-x64 --config Release
+
+mkdir build\clang-x86
+pushd build\clang-x86
+cmake -TClangCL -DCMAKE_GENERATOR_PLATFORM=Win32 -D_DIR=clang-x86 ..\..\
+popd
+mkdir build\clang-x64
+pushd build\clang-x64
+cmake -TClangCL -DCMAKE_GENERATOR_PLATFORM=x64 -D_DIR=clang-x64 ..\..\
+popd
+cmake --build build\clang-x86 --config Release
+cmake --build build\clang-x64 --config Release
 
 mkdir build\gcc-x64
 pushd build\gcc-x64

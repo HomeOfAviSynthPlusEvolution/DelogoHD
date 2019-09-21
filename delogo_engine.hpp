@@ -93,7 +93,7 @@ public:
 
   int YC2FadeYC(int y_color, int y_dp, double opacity) {
     // Computing in <<12
-    const int m = 219;
+    // const int m = 219;
     const int n = 67584;
     if (opacity > 1 - 1e-2)
       return y_color;
@@ -125,7 +125,7 @@ public:
 
   int CC2FadeCC(int c_color, int c_dp, double opacity) {
     // Computing in <<8, storing in <<12
-    const int m = 14;
+    // const int m = 14;
     const int n = 32896;
     if (opacity > 1 - 1e-2)
       return c_color;

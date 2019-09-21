@@ -14,13 +14,13 @@ public:
     const VSAPI * _vsapi;
     bool readonly;
   public:
-    VSFrameRef * _frame;
     VSVideoInfo _vi;
+    VSFrameRef * _frame;
     AFrame(VSFrameRef * frame, VSCore *core, const VSAPI *vsapi, VSVideoInfo vi)
-      : _core(core), _vsapi(vsapi), _vi(vi), _frame(frame), readonly(false) {
+      : _core(core), _vsapi(vsapi), readonly(false), _vi(vi), _frame(frame) {
     }
     AFrame(const VSFrameRef * frame, VSCore *core, const VSAPI *vsapi, VSVideoInfo vi)
-      : _core(core), _vsapi(vsapi), _vi(vi), _frame((VSFrameRef*)frame), readonly(true) {
+      : _core(core), _vsapi(vsapi), readonly(true), _vi(vi), _frame((VSFrameRef*)frame) {
     }
     AFrame* dup() {
       return new AFrame(_vsapi->copyFrame(_frame, _core), _core, _vsapi, _vi);
@@ -75,7 +75,7 @@ public:
   }
   virtual void initialize() {}
   virtual const char* name() const { return "VSFilter"; };
-
+  virtual ~VSFilter(){};
 protected:
   int byte_per_channel; // Useless here
   int bit_per_channel;  // Useless here
