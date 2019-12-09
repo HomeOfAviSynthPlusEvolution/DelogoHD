@@ -147,6 +147,10 @@ public:
   AFrame* Dup(AFrame* frame) {
     return frame->dup();
   }
+
+  void FreeFrame(AFrame* frame) {
+    _vsapi->freeFrame(frame->_frame);
+  }
   int ssw() const { return vi._vi.format->subSamplingW; }
   int ssh() const { return vi._vi.format->subSamplingH; }
 

@@ -64,6 +64,7 @@ public:
       engine->template processImage<uint16_t>(dst->GetWritePtr(PLANAR_V), this->stride(dst, PLANAR_V), this->width(dst, PLANAR_V), this->height(dst, PLANAR_V), 2, opacity);
 
     }
+    this->FreeFrame(src);
 
     return dst;
   }

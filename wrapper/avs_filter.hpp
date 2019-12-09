@@ -48,6 +48,8 @@ public:
     _env->MakeWritable(&frame);
     return frame;
   }
+
+  void FreeFrame(const PVideoFrame frame) { }
   int ssw() const { return vi.GetPlaneWidthSubsampling(PLANAR_U); }
   int ssh() const { return vi.GetPlaneHeightSubsampling(PLANAR_U); }
 
