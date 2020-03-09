@@ -4,8 +4,21 @@
 #include <cstdio>
 #include <cmath>
 #include <cstring>
-#include <intrin.h>
+#include <cstdlib>
 #include <assert.h>
+
+#if _MSC_VER
+  #include <intrin.h>
+#else
+  #include <x86intrin.h>
+#endif
+
+#if !_WIN32
+  #define __stdcall
+  // Use standard C11 aligned malloc
+  #define _aligned_malloc(size, alignment) aligned_alloc(alignment, size)
+  #define _aligned_free free
+#endif
 
 using namespace std;
 #define MATH_MIN(a,b) ((a) > (b) ? (b) : (a))

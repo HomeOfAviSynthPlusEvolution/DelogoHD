@@ -4,8 +4,7 @@
 template <EOperation EOP>
 LOGO_PIXEL* DelogoEngine<EOP>::readLogo(const char* logofile, const char* logoname) {
   if (logofile == NULL) throw "logo file not specified.";
-  FILE* lfp;
-  fopen_s(&lfp, logofile, "rb");
+  FILE* lfp = fopen(logofile, "rb");
   if (!lfp) throw "unable to open logo file, wrong file name?";
   fseek(lfp, 0, SEEK_END);
   size_t flen = ftell(lfp);
