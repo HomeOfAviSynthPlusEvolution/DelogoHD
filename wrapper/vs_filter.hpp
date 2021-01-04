@@ -150,6 +150,7 @@ public:
 
   void FreeFrame(AFrame* frame) {
     _vsapi->freeFrame(frame->_frame);
+    delete frame;
   }
   int ssw() const { return vi._vi.format->subSamplingW; }
   int ssh() const { return vi._vi.format->subSamplingH; }
@@ -174,6 +175,8 @@ public:
 
   const VSFrameRef *VS_CC GetFrame(VSFrameContext *_frameCtx, VSCore *_core, const VSAPI *vsapi, int n) {
     auto frame = dynamic_cast<AFrame*>(get(n));
-    return frame->_frame;
+    auto _frame = frame->_frame;
+    delete frame;
+    return _frame;
   }
 };
