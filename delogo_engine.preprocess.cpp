@@ -76,7 +76,7 @@ LOGO_PIXEL* DelogoEngine<EOP>::shiftLogo(LOGO_PIXEL* data, int left, int top) {
     newt = 0;
     padt = oldt;
   } else if ((padt = oldt % 2) != 0)
-    newt = oldt + padt;
+    newt = oldt - padt;
 
   // 3. Pad width
   neww += padl;
