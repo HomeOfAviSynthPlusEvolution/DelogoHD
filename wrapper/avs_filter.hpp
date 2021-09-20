@@ -53,6 +53,9 @@ public:
   int ssw() const { return vi.GetPlaneWidthSubsampling(PLANAR_U); }
   int ssh() const { return vi.GetPlaneHeightSubsampling(PLANAR_U); }
 
+  bool setVar(const char* name, const int value) {
+    return _env->SetVar(name, AVSValue(value));
+  }
 
   int stride(PVideoFrame& frame, int plane) const { return frame->GetPitch(plane); }
   int width (PVideoFrame& frame, int plane) const { return frame->GetRowSize(plane) / byte_per_channel; }

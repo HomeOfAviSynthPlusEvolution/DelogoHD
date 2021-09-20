@@ -1,5 +1,7 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "logo.h"
 #include <cstdio>
 #include <cmath>
@@ -36,13 +38,14 @@ enum EOperation { ADD_LOGO, ERASE_LOGO };
 template <EOperation EOP>
 class DelogoEngine {
 protected:
-  LOGO_HEADER logoheader;
   // Store ((1<<30) / real_value) for aligned_Xd
   int** logo_yc, ** logo_yd, ** logo_uc, ** logo_ud, ** logo_vc, ** logo_vd;
   int _wsubsampling, _hsubsampling;
   int _ebpc, _cutoff;
 
 public:
+  LOGO_HEADER logoheader;
+
   DelogoEngine(const char* logofile, const char* logoname, int bitdepth, int wsubsampling, int hsubsampling, int left, int top, bool mono, int cutoff) :
     logo_yc(nullptr), logo_yd(nullptr),
     logo_uc(nullptr), logo_ud(nullptr),

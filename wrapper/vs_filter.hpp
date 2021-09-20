@@ -155,6 +155,11 @@ public:
   int ssw() const { return vi._vi.format->subSamplingW; }
   int ssh() const { return vi._vi.format->subSamplingH; }
 
+  bool setVar(const char* name, const int value) {
+    // Not Implemented
+    return false;
+  }
+
   int stride(AFrame* frame, int plane) const { return _vsapi->getStride(frame->_frame, plane); }
   int width (AFrame* frame, int plane) const { return _vsapi->getFrameWidth(frame->_frame, plane); }
   int height(AFrame* frame, int plane) const { return _vsapi->getFrameHeight(frame->_frame, plane); }
