@@ -42,9 +42,10 @@ protected:
   int** logo_yc, ** logo_yd, ** logo_uc, ** logo_ud, ** logo_vc, ** logo_vd;
   int _wsubsampling, _hsubsampling;
   int _ebpc, _cutoff;
+  LOGO_HEADER logoheader;
 
 public:
-  LOGO_HEADER logoheader;
+  LOGO_HEADER src_logoheader;
 
   DelogoEngine(const char* logofile, const char* logoname, int bitdepth, int wsubsampling, int hsubsampling, int left, int top, bool mono, int cutoff) :
     logo_yc(nullptr), logo_yd(nullptr),

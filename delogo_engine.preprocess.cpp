@@ -35,6 +35,8 @@ LOGO_PIXEL* DelogoEngine<EOP>::readLogo(const char* logofile, const char* logona
   if (i == num) // So we couldn't find a match
     throw "unable to find a matching logo";
 
+  src_logoheader = logoheader;
+
   // Now we can read it and return
   LOGO_PIXEL* lgd = new LOGO_PIXEL[logoheader.h * logoheader.w];
   if (lgd == NULL) throw "unable to allocate memory";

@@ -38,10 +38,10 @@ public:
     if (logofile == NULL)
       throw("where's the logo file?");
     engine = new DelogoEngine<EOP>(logofile, logoname, this->depth(), this->ssw(), this->ssh(), left, top, mono, cutoff);
-    this->setVar("delogohd_left",   engine->logoheader.x);
-    this->setVar("delogohd_top",    engine->logoheader.y);
-    this->setVar("delogohd_width",  engine->logoheader.w);
-    this->setVar("delogohd_height", engine->logoheader.h);
+    this->setVar("delogohd_left",   engine->src_logoheader.x);
+    this->setVar("delogohd_top",    engine->src_logoheader.y);
+    this->setVar("delogohd_width",  engine->src_logoheader.w);
+    this->setVar("delogohd_height", engine->src_logoheader.h);
   }
 
   virtual auto get(int n) -> decltype(Interface::get(n)) {
