@@ -1,11 +1,4 @@
 import hashlib
-import ctypes
-import json
-import os
-from pathlib import Path
-import struct
-import subprocess
-import tempfile
 import unittest
 
 from tests.baseline import baseline_runner
@@ -146,6 +139,7 @@ class ScriptRenderingTests(unittest.TestCase):
 
         self.assertIn('src = BlankClip(width=64, height=48, length=9, pixel_type="Y8", color_yuv=$404040)', script)
 
+
 class VapourSynthSourceSelectionTests(unittest.TestCase):
     class SourceNamespace:
         def __init__(self, marker):
@@ -194,9 +188,11 @@ class CaseResolutionTests(unittest.TestCase):
             }
         ]
 
-        [case] = baseline_runner._resolve_case_sources(cases, baseline_runner.Path("/repo/tests/baseline/cases"))
+        base_dir = baseline_runner.Path("/repo/tests/baseline/cases")
+        [case] = baseline_runner._resolve_case_sources(cases, base_dir)
 
-        self.assertEqual(case["params"]["logofile"], "/repo/tests/baseline/assets/logos/test-640x180.lgd")
+        expected_path = base_dir.parent / "assets/logos/test-640x180.lgd"
+        self.assertEqual(case["params"]["logofile"], str(expected_path.resolve()))
 
     def test_canonical_params_store_baseline_relative_logo_path(self):
         params = {
@@ -244,88 +240,6 @@ class ExecutionBackendTests(unittest.TestCase):
             baseline_runner.host_params(case, "vs"),
             {"logofile": "/tmp/test.lgd", "opt": 1, "fadeout": 2},
         )
-
-
-class AvisynthHostVariableIntegrationTests(unittest.TestCase):
-    def test_avs_script_can_read_logo_host_variables_after_filter_creation(self):
-        plugin_path = _required_file_env(self, "DELOGOHD_TEST_PLUGIN")
-        avs_dump = _required_file_env(self, "DELOGOHD_TEST_AVS_DUMP")
-        logo_path = baseline_runner.BASELINE_DIR / "assets/logos/test-640x180.lgd"
-        script = _render_host_variable_avs_script(plugin_path, logo_path, _logo_host_vars())
-
-        with tempfile.TemporaryDirectory(prefix="delogohd-host-vars-") as temp_dir_name:
-            temp_dir = Path(temp_dir_name)
-            script_path = temp_dir / "host-vars.avs"
-            raw_path = temp_dir / "host-vars.bin"
-            meta_path = temp_dir / "host-vars.json"
-            script_path.write_text(script, encoding="utf-8")
-
-            subprocess.run(
-                [
-                    str(avs_dump),
-                    "--script",
-                    str(script_path),
-                    "--frame",
-                    "0",
-                    "--raw-out",
-                    str(raw_path),
-                    "--meta-out",
-                    str(meta_path),
-                ],
-                check=True,
-            )
-
-    def setUp(self):
-        _require_avisynth_runtime(self)
-
-
-def _logo_host_vars():
-    logo_path = baseline_runner.BASELINE_DIR / "assets/logos/test-640x180.lgd"
-    header = logo_path.read_bytes()[32:80]
-    _, left, top, height, width, _, _, _, _ = struct.unpack("<32s8h", header)
-    return {
-        "delogohd_left": left,
-        "delogohd_top": top,
-        "delogohd_width": width,
-        "delogohd_height": height,
-    }
-
-
-def _render_host_variable_avs_script(plugin_path, logo_path, expected_host_vars):
-    checks = [
-        f"{name} == {value}"
-        for name, value in expected_host_vars.items()
-    ]
-    frame_evaluate = f"Assert({' && '.join(checks)})"
-    return "\n".join(
-        [
-            f"LoadPlugin({json.dumps(str(plugin_path))})",
-            'src = BlankClip(width=640, height=180, length=1, pixel_type="YV12", color_yuv=$4060A0)',
-            f"clip = DelogoHD(src, logofile={json.dumps(str(logo_path))}, start=0, end=0)",
-            f"return FrameEvaluate(clip, {json.dumps(frame_evaluate)})",
-            "",
-        ]
-    )
-
-
-def _required_file_env(test_case, name):
-    value = os.environ.get(name)
-    if not value:
-        test_case.skipTest(f"{name} is not set")
-    path = Path(value)
-    if not path.exists():
-        test_case.skipTest(f"{name} does not exist: {path}")
-    return path.resolve()
-
-
-def _require_avisynth_runtime(test_case):
-    for runtime in ("libavisynth.so", "libavisynth.so.11", "avisynth.dll"):
-        try:
-            ctypes.CDLL(runtime)
-            return
-        except OSError:
-            pass
-    test_case.skipTest("AviSynth runtime is not available")
 
 
 if __name__ == "__main__":

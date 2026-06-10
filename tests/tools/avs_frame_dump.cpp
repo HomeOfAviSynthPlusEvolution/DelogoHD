@@ -1,6 +1,5 @@
 #include <avisynth.h>
 
-#include <array>
 #include <cstddef>
 #include <cstdlib>
 #include <filesystem>
@@ -20,13 +19,11 @@
 #include <dlfcn.h>
 #endif
 
-#if !defined(AVISYNTH_CLASSIC_INTERFACE_VERSION)
-#define AVISYNTH_CLASSIC_INTERFACE_VERSION AVISYNTH_INTERFACE_VERSION
-#endif
-
 const AVS_Linkage* AVS_linkage = nullptr;
 
 namespace {
+
+constexpr int kMinimumAviSynthInterfaceVersion = 6;
 
 struct Options {
   std::filesystem::path script;
@@ -216,18 +213,24 @@ DynamicLibrary load_avisynth_runtime(const Options& options) {
 }
 
 IScriptEnvironment* create_script_environment(CreateScriptEnvironmentFn create_environment) {
-  static constexpr std::array versions{
-    AVISYNTH_INTERFACE_VERSION,
-    AVISYNTH_CLASSIC_INTERFACE_VERSION
-  };
-
-  for (const int version : versions) {
+  std::string attempted_versions;
+  for (
+    int version = AVISYNTH_INTERFACE_VERSION;
+    version >= kMinimumAviSynthInterfaceVersion;
+    --version
+  ) {
+    if (!attempted_versions.empty()) {
+      attempted_versions += ", ";
+    }
+    attempted_versions += std::to_string(version);
     if (IScriptEnvironment* env = create_environment(version)) {
       return env;
     }
   }
 
-  throw std::runtime_error("CreateScriptEnvironment returned null for all supported versions");
+  throw std::runtime_error(
+    "CreateScriptEnvironment returned null for supported interface versions: " + attempted_versions
+  );
 }
 
 PClip import_clip(IScriptEnvironment* env, const std::filesystem::path& script) {

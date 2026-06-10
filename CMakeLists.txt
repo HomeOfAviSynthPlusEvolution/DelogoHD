@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+
 project(DelogoHD CXX)
 
 option(DELOGOHD_BUILD_TEST_TOOLS "Build DelogoHD baseline test tools" ON)
@@ -9,6 +13,10 @@ set(DELOGOHD_VAPOURSYNTH_TAG "R72" CACHE STRING "VapourSynth tag used when pkg-c
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(MSVC AND NOT CMAKE_MSVC_RUNTIME_LIBRARY)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
 
 include(FetchContent)
 
@@ -25,6 +33,9 @@ FetchContent_MakeAvailable(highway)
 
 set(DS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(DS_BUILD_ACCEPTANCE_PLUGIN OFF CACHE BOOL "" FORCE)
+if(MSVC)
+  set(DS_MSVC_RUNTIME_LIBRARY "${CMAKE_MSVC_RUNTIME_LIBRARY}" CACHE STRING "" FORCE)
+endif()
 FetchContent_Declare(
   dualsynth2
   GIT_REPOSITORY https://github.com/HomeOfAviSynthPlusEvolution/dualsynth2.git
