@@ -30,6 +30,7 @@ struct Options {
   std::filesystem::path raw_out;
   std::filesystem::path meta_out;
   std::string runtime;
+  std::vector<std::pair<std::string, int>> expected_int_vars;
   int frame = 0;
 };
 
@@ -122,7 +123,8 @@ using CreateScriptEnvironmentFn = IScriptEnvironment*(__stdcall *)(int);
 [[noreturn]] void throw_usage() {
   throw std::runtime_error(
     "usage: delogohd_avs_frame_dump --script script.avs --frame n "
-    "--raw-out frame.bin --meta-out frame.json [--runtime path]"
+    "--raw-out frame.bin --meta-out frame.json [--runtime path] "
+    "[--expect-int-var name=value ...]"
   );
 }
 
@@ -138,6 +140,17 @@ int parse_int(std::string_view text, const char* name) {
     throw std::runtime_error(std::string{"invalid "} + name + ": " + std::string{text});
   }
   return value;
+}
+
+std::pair<std::string, int> parse_expected_int_var(std::string_view text) {
+  const std::size_t separator = text.find('=');
+  if (separator == std::string_view::npos || separator == 0 || separator + 1 == text.size()) {
+    throw std::runtime_error("invalid expected int variable: " + std::string{text});
+  }
+
+  std::string name{text.substr(0, separator)};
+  const int value = parse_int(text.substr(separator + 1), "expected int variable value");
+  return {std::move(name), value};
 }
 
 Options parse_args(int argc, char** argv) {
@@ -169,6 +182,11 @@ Options parse_args(int argc, char** argv) {
         throw_usage();
       }
       options.runtime = argv[i];
+    } else if (arg == "--expect-int-var") {
+      if (++i >= argc) {
+        throw_usage();
+      }
+      options.expected_int_vars.push_back(parse_expected_int_var(argv[i]));
     } else {
       throw_usage();
     }
@@ -250,6 +268,29 @@ PClip import_clip(IScriptEnvironment* env, const std::filesystem::path& script) 
   return result.AsClip();
 }
 
+void verify_expected_int_vars(
+  IScriptEnvironment* env,
+  const std::vector<std::pair<std::string, int>>& expected_int_vars
+) {
+  for (const auto& [name, expected] : expected_int_vars) {
+    AVSValue value = env->GetVarDef(name.c_str(), AVSValue());
+    if (!value.Defined()) {
+      throw std::runtime_error("AviSynth variable was not set: " + name);
+    }
+    if (!value.IsInt()) {
+      throw std::runtime_error("AviSynth variable is not an int: " + name);
+    }
+    const int actual = value.AsInt();
+    if (actual != expected) {
+      throw std::runtime_error(
+        "AviSynth variable has unexpected value: " + name +
+        " expected " + std::to_string(expected) +
+        " got " + std::to_string(actual)
+      );
+    }
+  }
+}
+
 std::vector<std::pair<int, const char*>> canonical_planes(const VideoInfo& vi) {
   if (vi.IsPlanarRGBA()) {
     return {{PLANAR_R, "R"}, {PLANAR_G, "G"}, {PLANAR_B, "B"}, {PLANAR_A, "A"}};
@@ -324,6 +365,7 @@ void write_frame_data(
 
 void run(const Options& options, IScriptEnvironment* env) {
   PClip clip = import_clip(env, options.script);
+  verify_expected_int_vars(env, options.expected_int_vars);
   const VideoInfo& vi = clip->GetVideoInfo();
   if (!vi.HasVideo()) {
     throw std::runtime_error("script returned a clip without video");

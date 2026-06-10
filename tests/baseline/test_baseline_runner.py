@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import struct
 import subprocess
 import tempfile
 import unittest
@@ -260,21 +261,21 @@ class AvisynthHostVariableIntegrationTests(unittest.TestCase):
             raw_path = temp_dir / "host-vars.bin"
             meta_path = temp_dir / "host-vars.json"
             script_path.write_text(script, encoding="utf-8")
+            command = [
+                str(avs_dump),
+                "--script",
+                str(script_path),
+                "--frame",
+                "0",
+                "--raw-out",
+                str(raw_path),
+                "--meta-out",
+                str(meta_path),
+            ]
+            for name, value in _logo_host_vars(logo_path).items():
+                command.extend(["--expect-int-var", f"{name}={value}"])
 
-            subprocess.run(
-                [
-                    str(avs_dump),
-                    "--script",
-                    str(script_path),
-                    "--frame",
-                    "0",
-                    "--raw-out",
-                    str(raw_path),
-                    "--meta-out",
-                    str(meta_path),
-                ],
-                check=True,
-            )
+            subprocess.run(command, check=True)
 
 
 def _render_avs_host_variable_smoke_script(plugin_path, logo_path):
@@ -286,6 +287,17 @@ def _render_avs_host_variable_smoke_script(plugin_path, logo_path):
             "",
         ]
     )
+
+
+def _logo_host_vars(logo_path):
+    header = logo_path.read_bytes()[32:80]
+    _, left, top, height, width, _, _, _, _ = struct.unpack("<32s8h", header)
+    return {
+        "delogohd_left": left,
+        "delogohd_top": top,
+        "delogohd_width": width,
+        "delogohd_height": height,
+    }
 
 
 def _required_file_env(test_case, name):

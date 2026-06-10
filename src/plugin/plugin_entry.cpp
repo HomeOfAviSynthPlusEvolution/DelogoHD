@@ -24,6 +24,28 @@ const AVS_Linkage* AVS_linkage = nullptr;
 
 namespace {
 
+bool set_avisynth_host_var(void* user, const char* name, const ds::ParamValue& value) {
+  if (!user || !name) {
+    return false;
+  }
+
+  auto* env = static_cast<IScriptEnvironment*>(user);
+  AVSValue avs_value;
+  if (!ds::avisynth::assign_avisynth_value(env, value, avs_value)) {
+    return false;
+  }
+
+  env->SetVar(env->SaveString(name), avs_value);
+  return true;
+}
+
+ds::HostVariableCallbacks avisynth_host_variable_callbacks(IScriptEnvironment* env) {
+  if (!env) {
+    return {};
+  }
+  return ds::HostVariableCallbacks{env, &set_avisynth_host_var};
+}
+
 template <class Bridge>
 const char* avs_signature() {
   static const std::string signature = [] {
@@ -180,7 +202,7 @@ AVSValue __cdecl create_avisynth_filter(AVSValue args, void*, IScriptEnvironment
       input_infos,
       &params.value(),
       ds::avisynth::host_global_lock_callbacks(env),
-      ds::avisynth::host_variable_callbacks(env)
+      avisynth_host_variable_callbacks(env)
     );
     if (!init_result.has_value()) {
       env->ThrowError(init_result.error().message.c_str());
