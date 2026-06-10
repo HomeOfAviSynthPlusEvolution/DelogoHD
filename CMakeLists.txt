@@ -8,7 +8,8 @@ project(DelogoHD CXX)
 
 option(DELOGOHD_BUILD_TEST_TOOLS "Build DelogoHD baseline test tools" ON)
 option(DELOGOHD_COPY_RELEASE "Copy the built plugin to the legacy Release_<version> directory" OFF)
-set(DELOGOHD_AVISYNTHPLUS_TAG "v3.7.5" CACHE STRING "AviSynthPlus tag used when pkg-config cannot find AviSynth headers")
+# Pin past v3.7.5 so fallback headers allow Visual Studio ARM64 builds.
+set(DELOGOHD_AVISYNTHPLUS_TAG "751ce2021cab1c8405d04825ac2f7e8ac93e8fa0" CACHE STRING "AviSynthPlus tag used when pkg-config cannot find AviSynth headers")
 set(DELOGOHD_VAPOURSYNTH_TAG "R72" CACHE STRING "VapourSynth tag used when pkg-config cannot find VapourSynth headers")
 
 set(CMAKE_CXX_STANDARD 23)
@@ -48,7 +49,7 @@ function(delogohd_fetch_avisynth_headers out_var)
     avisynthplus_headers
     GIT_REPOSITORY https://github.com/AviSynth/AviSynthPlus.git
     GIT_TAG "${DELOGOHD_AVISYNTHPLUS_TAG}"
-    GIT_SHALLOW TRUE
+    # Full clone is required because the ARM64 header fix is pinned by commit.
     SOURCE_SUBDIR delogohd-no-cmake
   )
   FetchContent_MakeAvailable(avisynthplus_headers)
