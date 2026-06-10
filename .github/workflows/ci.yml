@@ -53,10 +53,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
+            build-essential \
             ca-certificates \
             cmake \
             debhelper \
-            g++ \
             git \
             pkgconf
 
