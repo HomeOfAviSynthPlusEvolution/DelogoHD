@@ -192,6 +192,9 @@ _pkginfo.txt
 ClientBin/
 ~$*
 *~
+__pycache__/
+*.py[cod]
+*.ffindex
 *.dbmdl
 *.dbproj.schemaview
 *.jfm

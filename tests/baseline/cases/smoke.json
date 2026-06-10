@@ -1,0 +1,179 @@
+{
+  "cases": [
+    {
+      "id": "blank_sequence_yuv420p8_delogo_fade",
+      "tier": "smoke",
+      "filter": "DelogoHD",
+      "source": {
+        "id": "blank_sequence_yuv420p8_640x180_10f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV420P8",
+        "avs_format": "YV12",
+        "colors": [
+          [32, 64, 96],
+          [48, 80, 112],
+          [64, 96, 160],
+          [80, 128, 176],
+          [96, 144, 192],
+          [112, 160, 208],
+          [128, 176, 224],
+          [144, 192, 96],
+          [160, 208, 112],
+          [176, 224, 128]
+        ],
+        "avs_colors": [
+          "$204060",
+          "$305070",
+          "$4060A0",
+          "$5080B0",
+          "$6090C0",
+          "$70A0D0",
+          "$80B0E0",
+          "$90C060",
+          "$A0D070",
+          "$B0E080"
+        ]
+      },
+      "frames": [0, 2, 3, 5, 7, 8, 9],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "start": 2,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3
+      }
+    },
+    {
+      "id": "blank_sequence_yuv420p8_addlogo_fade",
+      "tier": "smoke",
+      "filter": "AddlogoHD",
+      "source": {
+        "id": "blank_sequence_yuv420p8_640x180_10f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV420P8",
+        "avs_format": "YV12",
+        "colors": [
+          [32, 64, 96],
+          [48, 80, 112],
+          [64, 96, 160],
+          [80, 128, 176],
+          [96, 144, 192],
+          [112, 160, 208],
+          [128, 176, 224],
+          [144, 192, 96],
+          [160, 208, 112],
+          [176, 224, 128]
+        ],
+        "avs_colors": [
+          "$204060",
+          "$305070",
+          "$4060A0",
+          "$5080B0",
+          "$6090C0",
+          "$70A0D0",
+          "$80B0E0",
+          "$90C060",
+          "$A0D070",
+          "$B0E080"
+        ]
+      },
+      "frames": [0, 2, 3, 5, 7, 8, 9],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "start": 2,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3
+      }
+    },
+    {
+      "id": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "tier": "smoke",
+      "filter": "DelogoHD",
+      "source": {
+        "id": "blank_sequence_yuv420p8_640x180_10f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV420P8",
+        "avs_format": "YV12",
+        "colors": [
+          [40, 96, 160],
+          [56, 112, 176],
+          [72, 128, 192],
+          [88, 144, 208],
+          [104, 160, 224],
+          [120, 176, 96],
+          [136, 192, 112],
+          [152, 208, 128],
+          [168, 224, 144],
+          [184, 80, 160]
+        ],
+        "avs_colors": [
+          "$2860A0",
+          "$3870B0",
+          "$4880C0",
+          "$5890D0",
+          "$68A0E0",
+          "$78B060",
+          "$88C070",
+          "$98D080",
+          "$A8E090",
+          "$B850A0"
+        ]
+      },
+      "frames": [0, 2, 3, 5, 7, 8, 9],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "left": -5,
+        "top": 3,
+        "start": 2,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "mono": true,
+        "cutoff": 5
+      }
+    },
+    {
+      "id": "mp4_yuv420p8_delogo_10frames",
+      "tier": "smoke",
+      "filter": "DelogoHD",
+      "source": {
+        "id": "mp4_yuv420p8_1280x720_10f",
+        "type": "ffms2",
+        "path": "../sources/14946398.mp4"
+      },
+      "frames": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "start": 0,
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2
+      }
+    },
+    {
+      "id": "mp4_yuv420p8_addlogo_10frames",
+      "tier": "smoke",
+      "filter": "AddlogoHD",
+      "source": {
+        "id": "mp4_yuv420p8_1280x720_10f",
+        "type": "ffms2",
+        "path": "../sources/14946398.mp4"
+      },
+      "frames": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "start": 0,
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2
+      }
+    }
+  ]
+}
