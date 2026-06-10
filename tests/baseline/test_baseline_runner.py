@@ -1,4 +1,9 @@
 import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
 import unittest
 
 from tests.baseline import baseline_runner
@@ -240,6 +245,57 @@ class ExecutionBackendTests(unittest.TestCase):
             baseline_runner.host_params(case, "vs"),
             {"logofile": "/tmp/test.lgd", "opt": 1, "fadeout": 2},
         )
+
+
+class AvisynthHostVariableIntegrationTests(unittest.TestCase):
+    def test_avs_filter_with_logo_host_variables_renders_without_crashing(self):
+        plugin_path = _required_file_env(self, "DELOGOHD_TEST_PLUGIN")
+        avs_dump = _required_file_env(self, "DELOGOHD_TEST_AVS_DUMP")
+        logo_path = baseline_runner.BASELINE_DIR / "assets/logos/test-640x180.lgd"
+        script = _render_avs_host_variable_smoke_script(plugin_path, logo_path)
+
+        with tempfile.TemporaryDirectory(prefix="delogohd-host-vars-") as temp_dir_name:
+            temp_dir = Path(temp_dir_name)
+            script_path = temp_dir / "host-vars.avs"
+            raw_path = temp_dir / "host-vars.bin"
+            meta_path = temp_dir / "host-vars.json"
+            script_path.write_text(script, encoding="utf-8")
+
+            subprocess.run(
+                [
+                    str(avs_dump),
+                    "--script",
+                    str(script_path),
+                    "--frame",
+                    "0",
+                    "--raw-out",
+                    str(raw_path),
+                    "--meta-out",
+                    str(meta_path),
+                ],
+                check=True,
+            )
+
+
+def _render_avs_host_variable_smoke_script(plugin_path, logo_path):
+    return "\n".join(
+        [
+            f"LoadPlugin({json.dumps(str(plugin_path))})",
+            'src = BlankClip(width=640, height=180, length=1, pixel_type="YV12", color_yuv=$4060A0)',
+            f"return DelogoHD(src, logofile={json.dumps(str(logo_path))}, start=0, end=0)",
+            "",
+        ]
+    )
+
+
+def _required_file_env(test_case, name):
+    value = os.environ.get(name)
+    if not value:
+        test_case.skipTest(f"{name} is not set")
+    path = Path(value)
+    if not path.exists():
+        test_case.skipTest(f"{name} does not exist: {path}")
+    return path.resolve()
 
 
 if __name__ == "__main__":
