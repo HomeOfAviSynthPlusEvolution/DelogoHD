@@ -1,0 +1,210 @@
+{
+  "cases": [
+    {
+      "id": "compat_yuv420p10_delogo_logoname_positive_offset",
+      "tier": "compat",
+      "filter": "DelogoHD",
+      "source": {
+        "id": "blank_sequence_yuv420p10_640x180_8f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV420P10",
+        "avs_format": "YUV420P10",
+        "colors": [
+          [128, 256, 768],
+          [192, 320, 704],
+          [256, 384, 640],
+          [320, 448, 576],
+          [384, 512, 512],
+          [448, 576, 448],
+          [512, 640, 384],
+          [576, 704, 320]
+        ],
+        "avs_colors": [
+          "$2040C0",
+          "$3050B0",
+          "$4060A0",
+          "$507090",
+          "$608080",
+          "$709070",
+          "$80A060",
+          "$90B050"
+        ]
+      },
+      "frames": [0, 1, 2, 4, 5, 6, 7],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "logoname": "DelogoHD Test Logo",
+        "left": 11,
+        "top": 5,
+        "start": 1,
+        "end": 6,
+        "fadein": 2,
+        "fadeout": 2
+      }
+    },
+    {
+      "id": "compat_yuv422p12_addlogo_negative_offset_cutoff",
+      "tier": "compat",
+      "filter": "AddlogoHD",
+      "source": {
+        "id": "blank_sequence_yuv422p12_640x180_8f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV422P12",
+        "avs_format": "YUV422P12",
+        "colors": [
+          [512, 1024, 3072],
+          [768, 1280, 2816],
+          [1024, 1536, 2560],
+          [1280, 1792, 2304],
+          [1536, 2048, 2048],
+          [1792, 2304, 1792],
+          [2048, 2560, 1536],
+          [2304, 2816, 1280]
+        ],
+        "avs_colors": [
+          "$2040C0",
+          "$3050B0",
+          "$4060A0",
+          "$507090",
+          "$608080",
+          "$709070",
+          "$80A060",
+          "$90B050"
+        ]
+      },
+      "frames": [0, 1, 2, 4, 5, 6, 7],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "left": -40,
+        "top": -7,
+        "start": 1,
+        "end": 6,
+        "fadein": 2,
+        "fadeout": 2,
+        "cutoff": 10
+      }
+    },
+    {
+      "id": "compat_yuv444p16_delogo_mono_cutoff",
+      "tier": "compat",
+      "filter": "DelogoHD",
+      "source": {
+        "id": "blank_sequence_yuv444p16_640x180_8f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV444P16",
+        "avs_format": "YUV444P16",
+        "colors": [
+          [8192, 16384, 49152],
+          [12288, 20480, 45056],
+          [16384, 24576, 40960],
+          [20480, 28672, 36864],
+          [24576, 32768, 32768],
+          [28672, 36864, 28672],
+          [32768, 40960, 24576],
+          [36864, 45056, 20480]
+        ],
+        "avs_colors": [
+          "$2040C0",
+          "$3050B0",
+          "$4060A0",
+          "$507090",
+          "$608080",
+          "$709070",
+          "$80A060",
+          "$90B050"
+        ]
+      },
+      "frames": [0, 1, 2, 4, 5, 6, 7],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "start": 1,
+        "end": 6,
+        "fadein": 2,
+        "fadeout": 2,
+        "mono": true,
+        "cutoff": 80
+      }
+    },
+    {
+      "id": "compat_yuv444p16_addlogo_full_depth",
+      "tier": "compat",
+      "filter": "AddlogoHD",
+      "source": {
+        "id": "blank_sequence_yuv444p16_640x180_8f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV444P16",
+        "avs_format": "YUV444P16",
+        "colors": [
+          [8192, 16384, 49152],
+          [12288, 20480, 45056],
+          [16384, 24576, 40960],
+          [20480, 28672, 36864],
+          [24576, 32768, 32768],
+          [28672, 36864, 28672],
+          [32768, 40960, 24576],
+          [36864, 45056, 20480]
+        ],
+        "avs_colors": [
+          "$2040C0",
+          "$3050B0",
+          "$4060A0",
+          "$507090",
+          "$608080",
+          "$709070",
+          "$80A060",
+          "$90B050"
+        ]
+      },
+      "frames": [0, 1, 2, 4, 5, 6, 7],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "start": 1,
+        "end": 6,
+        "fadein": 2,
+        "fadeout": 2
+      }
+    },
+    {
+      "id": "compat_yuv420p8_delogo_left_outside_noop",
+      "tier": "compat",
+      "filter": "DelogoHD",
+      "source": {
+        "id": "blank_sequence_yuv420p8_640x180_5f",
+        "type": "blank_sequence",
+        "width": 640,
+        "height": 180,
+        "format": "YUV420P8",
+        "avs_format": "YV12",
+        "colors": [
+          [32, 64, 96],
+          [64, 96, 160],
+          [96, 144, 192],
+          [128, 176, 224],
+          [160, 208, 112]
+        ],
+        "avs_colors": [
+          "$204060",
+          "$4060A0",
+          "$6090C0",
+          "$80B0E0",
+          "$A0D070"
+        ]
+      },
+      "frames": [0, 2, 4],
+      "params": {
+        "logofile": "../assets/logos/test-640x180.lgd",
+        "left": 640,
+        "start": 0,
+        "end": 4
+      }
+    }
+  ]
+}
