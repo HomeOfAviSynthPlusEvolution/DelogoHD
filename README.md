@@ -4,6 +4,11 @@ DelogoHD is an AviSynth+ and VapourSynth filter for removing or re-applying
 logos stored in `.lgd` logo files. It supports planar YUV 4:2:0, 4:2:2, and
 4:4:4 clips with 8, 10, 12, 14, or 16-bit integer samples.
 
+DelogoHD is based on the original
+[delogo](https://github.com/makiuchi-d/delogo-avisynth) AviSynth filter by
+[MakKi](https://github.com/makiuchi-d), preserving the `.lgd` logo workflow
+while adding modern AviSynth+ and VapourSynth support.
+
 ## Usage
 
 ### AviSynth+
