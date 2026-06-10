@@ -345,6 +345,11 @@ void run_with_environment(const Options& options, CreateScriptEnvironmentFn crea
   try {
     AVS_linkage = env->GetAVSLinkage();
     run(options, env);
+  } catch (const AvisynthError& error) {
+    const std::string message = error.msg ? error.msg : "unknown AviSynth error";
+    env->DeleteScriptEnvironment();
+    AVS_linkage = nullptr;
+    throw std::runtime_error("AviSynth error: " + message);
   } catch (...) {
     env->DeleteScriptEnvironment();
     AVS_linkage = nullptr;
