@@ -4,7 +4,6 @@
 #include "core/delogo_processor.hpp"
 
 #include <algorithm>
-#include <cstring>
 #include <optional>
 #include <span>
 
@@ -96,12 +95,14 @@ std::optional<LogoImage> shift_logo(LogoImage image, int left, int top) {
   }
 
   std::vector<LOGO_PIXEL> shifted(static_cast<std::size_t>(neww) * newh);
+  auto src_pixels = std::span{image.pixels};
+  auto dst_pixels = std::span{shifted};
   for (int y = 0; y < len_v; ++y) {
-    std::memcpy(
-      shifted.data() + dst_h + static_cast<std::size_t>(y + dst_v) * neww,
-      image.pixels.data() + src_h + static_cast<std::size_t>(y + src_v) * image.header.w,
-      static_cast<std::size_t>(len_h) * sizeof(LOGO_PIXEL)
-    );
+    const auto src_offset = src_h + static_cast<std::size_t>(y + src_v) * image.header.w;
+    const auto dst_offset = dst_h + static_cast<std::size_t>(y + dst_v) * neww;
+    auto src_row = src_pixels.subspan(src_offset, static_cast<std::size_t>(len_h));
+    auto dst_row = dst_pixels.subspan(dst_offset, static_cast<std::size_t>(len_h));
+    std::copy(src_row.begin(), src_row.end(), dst_row.begin());
   }
 
   image.header.w = static_cast<int16_t>(neww);
@@ -122,7 +123,7 @@ void LogoPlaneCoefficients::reset(int width, int height) {
 }
 
 bool LogoPlaneCoefficients::active() const noexcept {
-  return c_.data() != nullptr && d_.data() != nullptr;
+  return !c_.empty() && !d_.empty();
 }
 
 int LogoPlaneCoefficients::width() const noexcept {
@@ -134,31 +135,31 @@ int LogoPlaneCoefficients::height() const noexcept {
 }
 
 std::span<int> LogoPlaneCoefficients::c_row(int y) noexcept {
-  return {
-    c_.data() + static_cast<std::size_t>(y) * width_,
+  return c_.subspan(
+    static_cast<std::size_t>(y) * width_,
     static_cast<std::size_t>(width_)
-  };
+  );
 }
 
 std::span<int> LogoPlaneCoefficients::d_row(int y) noexcept {
-  return {
-    d_.data() + static_cast<std::size_t>(y) * width_,
+  return d_.subspan(
+    static_cast<std::size_t>(y) * width_,
     static_cast<std::size_t>(width_)
-  };
+  );
 }
 
 std::span<const int> LogoPlaneCoefficients::c_row(int y) const noexcept {
-  return {
-    c_.data() + static_cast<std::size_t>(y) * width_,
+  return c_.subspan(
+    static_cast<std::size_t>(y) * width_,
     static_cast<std::size_t>(width_)
-  };
+  );
 }
 
 std::span<const int> LogoPlaneCoefficients::d_row(int y) const noexcept {
-  return {
-    d_.data() + static_cast<std::size_t>(y) * width_,
+  return d_.subspan(
+    static_cast<std::size_t>(y) * width_,
     static_cast<std::size_t>(width_)
-  };
+  );
 }
 
 PreparedLogo::PreparedLogo(const DelogoProcessorConfig& config)

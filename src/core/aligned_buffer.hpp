@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <span>
 #include <utility>
 
 #if defined(_WIN32)
@@ -68,8 +69,28 @@ public:
     return data_;
   }
 
+  std::span<T> span() noexcept {
+    return {data_, count_};
+  }
+
+  std::span<const T> span() const noexcept {
+    return {data_, count_};
+  }
+
+  std::span<T> subspan(std::size_t offset, std::size_t count) noexcept {
+    return span().subspan(offset, count);
+  }
+
+  std::span<const T> subspan(std::size_t offset, std::size_t count) const noexcept {
+    return span().subspan(offset, count);
+  }
+
   std::size_t size() const noexcept {
     return count_;
+  }
+
+  bool empty() const noexcept {
+    return count_ == 0;
   }
 
   T& operator[](std::size_t index) noexcept {

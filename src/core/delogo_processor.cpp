@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 #include <span>
 
 namespace delogohd::core {
@@ -85,10 +86,14 @@ std::span<Pixel> pixel_row(
   int x,
   int width
 ) {
-  return {
-    &pixels[static_cast<std::size_t>(y), static_cast<std::size_t>(x)],
-    static_cast<std::size_t>(width)
-  };
+  const auto first = static_cast<std::size_t>(x);
+  const auto last = first + static_cast<std::size_t>(width);
+  auto row = std::submdspan(
+    pixels,
+    static_cast<std::size_t>(y),
+    std::pair{first, last}
+  );
+  return {row.data_handle(), row.extent(0)};
 }
 
 } // namespace
