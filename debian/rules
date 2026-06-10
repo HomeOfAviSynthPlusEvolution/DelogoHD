@@ -18,6 +18,8 @@ override_dh_auto_configure:
 		-DDELOGOHD_COPY_RELEASE=OFF \
 		-DFETCHCONTENT_FULLY_DISCONNECTED=OFF
 
+override_dh_auto_test:
+
 override_dh_auto_install:
 	dh_auto_install --buildsystem=cmake --builddirectory=$(CMAKE_BUILD_DIR)
 	install -D -m 0644 $(CMAKE_BUILD_DIR)/$(PLUGIN_NAME) \

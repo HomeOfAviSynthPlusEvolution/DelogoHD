@@ -20,23 +20,27 @@ jobs:
           - name: linux-x64
             runner: ubuntu-24.04
             platform: linux
-            artifact: libDelogoHD.so
+            artifact_name: delogohd-linux-x64
+            artifact: build/artifacts/*.deb
           - name: linux-arm64
             runner: ubuntu-24.04-arm
             platform: linux
-            artifact: libDelogoHD.so
+            artifact_name: delogohd-linux-arm64
+            artifact: build/artifacts/*.deb
           - name: windows-x64
             runner: windows-2025-vs2026
             platform: windows
             generator: Visual Studio 18 2026
             arch: x64
-            artifact: Release/DelogoHD.dll
+            artifact_name: delogohd-windows-x64
+            artifact: build/ci/Release/DelogoHD.dll
           - name: windows-arm64
             runner: windows-11-arm
             platform: windows
             generator: Visual Studio 17 2022
             arch: ARM64
-            artifact: Release/DelogoHD.dll
+            artifact_name: delogohd-windows-arm64
+            artifact: build/ci/Release/DelogoHD.dll
 
     steps:
       - name: Checkout
@@ -44,13 +48,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Configure Linux
+      - name: Install Debian build dependencies
         if: matrix.platform == 'linux'
-        run: >
-          cmake -S . -B build/ci
-          -DCMAKE_BUILD_TYPE=Release
-          -DDELOGOHD_BUILD_TEST_TOOLS=OFF
-          -DDELOGOHD_COPY_RELEASE=OFF
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            debhelper \
+            g++ \
+            git \
+            pkgconf
+
+      - name: Build Debian package
+        if: matrix.platform == 'linux'
+        run: |
+          dpkg-buildpackage -us -uc -b -j4
+          mkdir -p build/artifacts
+          cp ../dualsynth-delogohd_*.deb build/artifacts/
 
       - name: Configure Windows
         if: matrix.platform == 'windows'
@@ -63,11 +78,12 @@ jobs:
           -DDELOGOHD_COPY_RELEASE=OFF
 
       - name: Build
+        if: matrix.platform == 'windows'
         run: cmake --build build/ci --config Release --parallel 4
 
       - name: Upload plugin
         uses: actions/upload-artifact@v7
         with:
-          name: DelogoHD-${{ matrix.name }}
-          path: build/ci/${{ matrix.artifact }}
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact }}
           if-no-files-found: error
