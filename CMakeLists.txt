@@ -39,7 +39,7 @@ endif()
 FetchContent_Declare(
   dualsynth2
   GIT_REPOSITORY https://github.com/HomeOfAviSynthPlusEvolution/dualsynth2.git
-  GIT_TAG master
+  GIT_TAG 0.1
 )
 FetchContent_MakeAvailable(dualsynth2)
 
