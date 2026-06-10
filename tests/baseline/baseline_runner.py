@@ -16,6 +16,7 @@ PLUGIN_NAMESPACE = "delogohd"
 DEFAULT_FILTER = "DelogoHD"
 PATH_PARAM_KEYS = {"logofile"}
 BASELINE_DIR = Path(__file__).resolve().parent
+BACKENDS = ("purec", "highway")
 
 
 @dataclass(frozen=True)
@@ -224,6 +225,17 @@ def host_params(case: dict, host: str) -> dict:
     return params
 
 
+def execution_params(case: dict, host: str, backend: str) -> dict:
+    params = host_params(case, host)
+    if backend == "purec":
+        params["opt"] = 1
+    elif backend == "highway":
+        params.pop("opt", None)
+    else:
+        raise ValueError(f"unsupported backend: {backend}")
+    return params
+
+
 def load_cases(cases_dir: Path) -> list[dict]:
     cases: list[dict] = []
     for path in sorted(cases_dir.glob("*.json")):
@@ -257,7 +269,7 @@ def _resolve_param_paths(params: dict, base_dir: Path) -> dict:
     return params
 
 
-def run_vs_case(case: dict, plugin_path: Path) -> list[dict]:
+def run_vs_case(case: dict, plugin_path: Path, backend: str) -> list[dict]:
     import vapoursynth as vs
 
     core = vs.core
@@ -269,7 +281,7 @@ def run_vs_case(case: dict, plugin_path: Path) -> list[dict]:
     clip = _vs_source_clip(core, vs, case["source"])
     filter_name = case.get("filter", DEFAULT_FILTER)
     namespace = getattr(core, PLUGIN_NAMESPACE)
-    clip = getattr(namespace, filter_name)(clip, **host_params(case, "vs"))
+    clip = getattr(namespace, filter_name)(clip, **execution_params(case, "vs", backend))
 
     results = []
     for frame_number in case["frames"]:
@@ -313,9 +325,9 @@ def _vs_source_clip(core, vs, source: dict):
     raise ValueError(f"unsupported source type: {source['type']}")
 
 
-def run_avs_case(case: dict, plugin_path: Path, avs_dump: Path) -> list[dict]:
+def run_avs_case(case: dict, plugin_path: Path, avs_dump: Path, backend: str) -> list[dict]:
     source = case["source"]
-    params = host_params(case, "avs")
+    params = execution_params(case, "avs", backend)
     filter_name = case.get("filter", DEFAULT_FILTER)
     script = render_avs_script(str(plugin_path), source, filter_name, params)
 
@@ -450,16 +462,22 @@ def _canonical_metadata(metadata: dict) -> dict:
     return canonical
 
 
-def run_cases(cases: list[dict], hosts: list[str], plugin_path: Path, avs_dump: Path | None) -> list[dict]:
+def run_cases(
+    cases: list[dict],
+    hosts: list[str],
+    plugin_path: Path,
+    avs_dump: Path | None,
+    backend: str,
+) -> list[dict]:
     results: list[dict] = []
     for case in cases:
         case_hosts = case.get("hosts", ["vs", "avs"])
         if "vs" in hosts and "vs" in case_hosts:
-            results.extend(run_vs_case(case, plugin_path))
+            results.extend(run_vs_case(case, plugin_path, backend))
         if "avs" in hosts and "avs" in case_hosts:
             if avs_dump is None:
                 raise ValueError("--avs-dump is required when running AviSynth cases")
-            results.extend(run_avs_case(case, plugin_path, avs_dump))
+            results.extend(run_avs_case(case, plugin_path, avs_dump, backend))
     return results
 
 
@@ -485,13 +503,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--golden", required=True, type=Path)
     parser.add_argument("--tier", default="smoke")
     parser.add_argument("--hosts", nargs="+", default=["vs", "avs"], choices=["vs", "avs"])
+    parser.add_argument("--backend", default="highway", choices=BACKENDS)
     args = parser.parse_args(argv)
 
     plugin_path = args.plugin.resolve()
     avs_dump = args.avs_dump.resolve() if args.avs_dump else None
 
     cases = select_cases(load_cases(args.cases_dir), args.tier)
-    results = run_cases(cases, args.hosts, plugin_path, avs_dump)
+    results = run_cases(cases, args.hosts, plugin_path, avs_dump, args.backend)
     if args.command == "generate":
         write_golden(args.golden, results)
     else:

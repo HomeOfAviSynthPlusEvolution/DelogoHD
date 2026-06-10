@@ -153,4 +153,20 @@ if(DELOGOHD_BUILD_TEST_TOOLS)
       ENVIRONMENT
         "DELOGOHD_TEST_PLUGIN=$<TARGET_FILE:DelogoHD>;DELOGOHD_TEST_AVS_DUMP=$<TARGET_FILE:delogohd_avs_frame_dump>"
   )
+
+  foreach(backend IN ITEMS purec highway)
+    foreach(tier IN ITEMS smoke compat)
+      add_test(
+        NAME baseline_${backend}_${tier}
+        COMMAND
+          ${Python3_EXECUTABLE} -m tests.baseline.baseline_runner verify
+          --plugin $<TARGET_FILE:DelogoHD>
+          --avs-dump $<TARGET_FILE:delogohd_avs_frame_dump>
+          --golden "${PROJECT_SOURCE_DIR}/tests/baseline/golden/${tier}.json"
+          --tier ${tier}
+          --backend ${backend}
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+      )
+    endforeach()
+  endforeach()
 endif()

@@ -210,6 +210,42 @@ class CaseResolutionTests(unittest.TestCase):
         self.assertEqual(canonical["fadein"], 3)
 
 
+class ExecutionBackendTests(unittest.TestCase):
+    def test_purec_backend_adds_opt_for_execution_only(self):
+        case = {
+            "params": {"logofile": "/tmp/test.lgd", "start": 0},
+            "avs_params": {"fadein": 2},
+        }
+
+        params = baseline_runner.execution_params(case, "avs", "purec")
+
+        self.assertEqual(
+            params,
+            {"logofile": "/tmp/test.lgd", "start": 0, "fadein": 2, "opt": 1},
+        )
+        self.assertEqual(
+            baseline_runner.host_params(case, "avs"),
+            {"logofile": "/tmp/test.lgd", "start": 0, "fadein": 2},
+        )
+
+    def test_highway_backend_removes_case_opt_override_for_execution_only(self):
+        case = {
+            "params": {"logofile": "/tmp/test.lgd", "opt": 1},
+            "vs_params": {"fadeout": 2},
+        }
+
+        params = baseline_runner.execution_params(case, "vs", "highway")
+
+        self.assertEqual(
+            params,
+            {"logofile": "/tmp/test.lgd", "fadeout": 2},
+        )
+        self.assertEqual(
+            baseline_runner.host_params(case, "vs"),
+            {"logofile": "/tmp/test.lgd", "opt": 1, "fadeout": 2},
+        )
+
+
 class AvisynthHostVariableIntegrationTests(unittest.TestCase):
     def test_avs_script_can_read_logo_host_variables_after_filter_creation(self):
         plugin_path = _required_file_env(self, "DELOGOHD_TEST_PLUGIN")

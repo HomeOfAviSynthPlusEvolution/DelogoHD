@@ -81,45 +81,6 @@ void store_pixels_from_u64(
   }
 }
 
-template <int kBitDepth, class Pixel>
-std::size_t process_add_row_vector(
-  std::span<Pixel> row,
-  std::span<const int> colors,
-  std::span<const int> depths
-) {
-  const hn::ScalableTag<std::uint64_t> d64;
-  const hn::Rebind<std::uint32_t, decltype(d64)> d32;
-  const hn::Rebind<std::int32_t, decltype(d64)> di32;
-  const std::size_t lane_count = hn::Lanes(d64);
-  std::size_t j = 0;
-
-  const auto logo_max = hn::Set(d64, std::uint64_t{LOGO_MAX_DP});
-  const auto round = hn::Set(d64, std::uint64_t{LOGO_MAX_DP / 2});
-  const auto reciprocal = hn::Set(d64, std::uint64_t{274877907});
-  const auto one = hn::Set(d64, std::uint64_t{1});
-  const auto pixel_max = hn::Set(d64, std::uint64_t{(1 << kBitDepth) - 1});
-
-  for (; j + lane_count <= row.size(); j += lane_count) {
-    const auto sample = load_pixels_as_u64(d64, row, j, lane_count);
-    const auto source = hn::ShiftLeft<20 - kBitDepth>(sample);
-    const auto color = hn::PromoteTo(d64, hn::BitCast(d32, hn::LoadN(di32, colors.data() + j, lane_count)));
-    const auto depth = hn::PromoteTo(d64, hn::BitCast(d32, hn::LoadN(di32, depths.data() + j, lane_count)));
-    const auto remaining = logo_max - depth;
-    auto numerator = hn::Mul(source, remaining);
-    numerator = numerator + hn::Mul(color, depth);
-    numerator = numerator + round;
-
-    auto value = hn::ShiftRight<38>(hn::Mul(numerator, reciprocal));
-    value = hn::ShiftRight<18 - kBitDepth>(value);
-    value = hn::ShiftRight<2>(value + one);
-    value = hn::Min(value, pixel_max);
-
-    store_pixels_from_u64(d64, row, j, value, lane_count);
-  }
-
-  return j;
-}
-
 template <class D64, class V64>
 auto divide_u64_by_reciprocal_table(D64 d64, V64 numerator, V64 denominator) {
   const hn::Rebind<std::int64_t, D64> di64;
@@ -135,6 +96,71 @@ auto divide_u64_by_reciprocal_table(D64 d64, V64 numerator, V64 denominator) {
   return hn::IfThenElse(needs_increment, next_quotient, quotient);
 }
 
+template <class D64, class V64I, class V64U>
+auto divide_i64_by_reciprocal_table(D64 d64, V64I numerator, V64U denominator) {
+  const hn::Rebind<std::int64_t, D64> di64;
+  const auto zero_i64 = hn::Zero(di64);
+  const auto negative = hn::Lt(numerator, zero_i64);
+  const auto magnitude = hn::IfThenElse(
+    hn::RebindMask(d64, negative),
+    hn::BitCast(d64, hn::Neg(numerator)),
+    hn::BitCast(d64, numerator)
+  );
+  const auto quotient = divide_u64_by_reciprocal_table(d64, magnitude, denominator);
+  return hn::IfThenElse(
+    negative,
+    hn::Neg(hn::BitCast(di64, quotient)),
+    hn::BitCast(di64, quotient)
+  );
+}
+
+template <int kBitDepth, class D64, class V64I>
+auto sample_from_internal(D64 d64, V64I values) {
+  const hn::Rebind<std::int64_t, D64> di64;
+  const auto zero_i64 = hn::Zero(di64);
+  const auto one = hn::Set(d64, std::uint64_t{1});
+  const auto pixel_max = hn::Set(d64, std::uint64_t{(1 << kBitDepth) - 1});
+  auto value = hn::BitCast(d64, hn::Max(values, zero_i64));
+  value = hn::ShiftRight<18 - kBitDepth>(value);
+  value = hn::ShiftRight<2>(value + one);
+  return hn::Min(value, pixel_max);
+}
+
+template <int kBitDepth, class Pixel>
+std::size_t process_add_row_vector(
+  std::span<Pixel> row,
+  std::span<const int> colors,
+  std::span<const int> depths
+) {
+  const hn::ScalableTag<std::uint64_t> d64;
+  const hn::Rebind<std::int64_t, decltype(d64)> di64;
+  const hn::Rebind<std::int32_t, decltype(d64)> di32;
+  const std::size_t lane_count = hn::Lanes(d64);
+  std::size_t j = 0;
+
+  const auto logo_max = hn::Set(di64, std::int64_t{LOGO_MAX_DP});
+  const auto logo_max_u = hn::Set(d64, std::uint64_t{LOGO_MAX_DP});
+  const auto round = hn::Set(di64, std::int64_t{LOGO_MAX_DP / 2});
+
+  for (; j + lane_count <= row.size(); j += lane_count) {
+    const auto sample = load_pixels_as_u64(d64, row, j, lane_count);
+    const auto source = hn::BitCast(di64, hn::ShiftLeft<20 - kBitDepth>(sample));
+    const auto color = hn::PromoteTo(di64, hn::LoadN(di32, colors.data() + j, lane_count));
+    const auto depth = hn::PromoteTo(di64, hn::LoadN(di32, depths.data() + j, lane_count));
+    const auto remaining = logo_max - depth;
+    auto numerator = hn::Mul(source, remaining);
+    numerator = numerator + hn::Mul(color, depth);
+    numerator = numerator + round;
+
+    const auto mixed = divide_i64_by_reciprocal_table(d64, numerator, logo_max_u);
+    const auto value = sample_from_internal<kBitDepth>(d64, mixed);
+
+    store_pixels_from_u64(d64, row, j, value, lane_count);
+  }
+
+  return j;
+}
+
 template <int kBitDepth, class Pixel>
 std::size_t process_erase_row_vector(
   std::span<Pixel> row,
@@ -143,46 +169,31 @@ std::size_t process_erase_row_vector(
 ) {
   const hn::ScalableTag<std::uint64_t> d64;
   const hn::Rebind<std::int64_t, decltype(d64)> di64;
-  const hn::Rebind<std::uint32_t, decltype(d64)> d32;
   const hn::Rebind<std::int32_t, decltype(d64)> di32;
   const std::size_t lane_count = hn::Lanes(d64);
   std::size_t j = 0;
 
-  const auto logo_max = hn::Set(d64, std::uint64_t{LOGO_MAX_DP});
-  const auto max_alpha = hn::Set(d64, std::uint64_t{LOGO_MAX_DP - 1});
-  const auto one = hn::Set(d64, std::uint64_t{1});
-  const auto pixel_max = hn::Set(d64, std::uint64_t{(1 << kBitDepth) - 1});
-  const auto zero_i64 = hn::Zero(di64);
+  const auto logo_max = hn::Set(di64, std::int64_t{LOGO_MAX_DP});
+  const auto max_alpha = hn::Set(di64, std::int64_t{LOGO_MAX_DP - 1});
 
   for (; j + lane_count <= row.size(); j += lane_count) {
     const auto sample = load_pixels_as_u64(d64, row, j, lane_count);
-    const auto source = hn::ShiftLeft<20 - kBitDepth>(sample);
-    const auto color = hn::PromoteTo(d64, hn::BitCast(d32, hn::LoadN(di32, colors.data() + j, lane_count)));
-    const auto depth = hn::PromoteTo(d64, hn::BitCast(d32, hn::LoadN(di32, depths.data() + j, lane_count)));
+    const auto source = hn::BitCast(di64, hn::ShiftLeft<20 - kBitDepth>(sample));
+    const auto color = hn::PromoteTo(di64, hn::LoadN(di32, colors.data() + j, lane_count));
+    const auto depth = hn::PromoteTo(di64, hn::LoadN(di32, depths.data() + j, lane_count));
     const auto alpha = hn::Min(depth, max_alpha);
     const auto remaining = logo_max - alpha;
 
-    auto numerator = hn::BitCast(di64, hn::Mul(source, logo_max));
-    numerator = numerator - hn::BitCast(di64, hn::Mul(color, alpha));
-    numerator = numerator + hn::BitCast(di64, hn::ShiftRight<1>(remaining));
+    auto numerator = hn::Mul(source, logo_max);
+    numerator = numerator - hn::Mul(color, alpha);
+    numerator = numerator + hn::ShiftRight<1>(remaining);
 
-    const auto negative = hn::Lt(numerator, zero_i64);
-    const auto magnitude = hn::IfThenElse(
-      hn::RebindMask(d64, negative),
-      hn::BitCast(d64, hn::Neg(numerator)),
-      hn::BitCast(d64, numerator)
+    const auto restored = divide_i64_by_reciprocal_table(
+      d64,
+      numerator,
+      hn::BitCast(d64, remaining)
     );
-    auto quotient = divide_u64_by_reciprocal_table(d64, magnitude, remaining);
-    const auto restored = hn::IfThenElse(
-      negative,
-      hn::Neg(hn::BitCast(di64, quotient)),
-      hn::BitCast(di64, quotient)
-    );
-
-    auto value = hn::BitCast(d64, hn::Max(restored, zero_i64));
-    value = hn::ShiftRight<18 - kBitDepth>(value);
-    value = hn::ShiftRight<2>(value + one);
-    value = hn::Min(value, pixel_max);
+    const auto value = sample_from_internal<kBitDepth>(d64, restored);
 
     store_pixels_from_u64(d64, row, j, value, lane_count);
   }
