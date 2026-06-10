@@ -147,4 +147,10 @@ if(DELOGOHD_BUILD_TEST_TOOLS)
     COMMAND ${Python3_EXECUTABLE} -m unittest discover -s tests -v
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
   )
+  set_tests_properties(
+    baseline_runner_unit
+    PROPERTIES
+      ENVIRONMENT
+        "DELOGOHD_TEST_PLUGIN=$<TARGET_FILE:DelogoHD>;DELOGOHD_TEST_AVS_DUMP=$<TARGET_FILE:delogohd_avs_frame_dump>"
+  )
 endif()
