@@ -5,6 +5,7 @@
 #include "core/row_kernel.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 
 namespace delogohd::core {
@@ -129,13 +130,20 @@ void DelogoProcessor::process_plane(
     logoh >>= logo_.subsampling_h();
   }
 
-  auto* rowptr = static_cast<unsigned char*>(plane.data) +
-    static_cast<std::ptrdiff_t>(plane.stride_bytes) * logoy;
   const int upbound = std::min(logow, plane.width - logox);
+  const int row_count = std::min(logoh, plane.height - logoy);
+  if (upbound <= 0 || row_count <= 0) {
+    return;
+  }
+
+  auto pixels = ds::as_plane_view<Pixel>(plane);
 
   if (opacity <= kOpaqueThreshold) {
-    for (int i = 0; i < logoh && i < plane.height - logoy; ++i) {
-      auto* cellptr = reinterpret_cast<Pixel*>(rowptr) + logox;
+    for (int i = 0; i < row_count; ++i) {
+      Pixel* cellptr = &pixels[
+        static_cast<std::size_t>(logoy + i),
+        static_cast<std::size_t>(logox)
+      ];
       if (operation_ == LogoOperation::Add) {
         process_add_fade_row(
           cellptr,
@@ -157,13 +165,15 @@ void DelogoProcessor::process_plane(
           backend_
         );
       }
-      rowptr += plane.stride_bytes;
     }
     return;
   }
 
-  for (int i = 0; i < logoh && i < plane.height - logoy; ++i) {
-    auto* cellptr = reinterpret_cast<Pixel*>(rowptr) + logox;
+  for (int i = 0; i < row_count; ++i) {
+    Pixel* cellptr = &pixels[
+      static_cast<std::size_t>(logoy + i),
+      static_cast<std::size_t>(logox)
+    ];
     process_opaque_row(
       operation_,
       backend_,
@@ -173,7 +183,6 @@ void DelogoProcessor::process_plane(
       coefficients.d_row(i),
       bit_depth_
     );
-    rowptr += plane.stride_bytes;
   }
 }
 
