@@ -89,6 +89,7 @@ set(DELOGOHD_SOURCES
   src/core/logo_file.hpp
   src/core/prepared_logo.cpp
   src/core/prepared_logo.hpp
+  src/core/reciprocal_math.hpp
   src/core/row_kernel_c.cpp
   src/core/row_kernel_hwy.cpp
   src/core/row_kernel.hpp

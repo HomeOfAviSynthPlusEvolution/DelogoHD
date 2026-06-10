@@ -51,8 +51,6 @@ private:
   int subsampling_w_ = 0;
   int subsampling_h_ = 0;
   int cutoff_ = 0;
-  bool canonical_ = false;
-  bool erase_ = true;
   bool active_ = false;
 };
 

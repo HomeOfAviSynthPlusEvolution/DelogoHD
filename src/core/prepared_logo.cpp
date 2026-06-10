@@ -11,24 +11,6 @@ namespace delogohd::core {
 
 namespace {
 
-int auyc_to_yc(int auy_color, int auy_dp) {
-  const int m = 219;
-  const int n = 67584;
-  const int maxdp_dp = LOGO_MAX_DP - auy_dp;
-  const int offset = n * LOGO_MAX_DP + auy_color * auy_dp * m;
-  const int bonus = n * maxdp_dp;
-  return bonus - offset;
-}
-
-int aucc_to_cc(int auc_color, int auc_dp) {
-  const int m = 14;
-  const int n = 32896;
-  const int maxdp_dp = LOGO_MAX_DP - auc_dp;
-  const int offset = n * LOGO_MAX_DP + auc_color * auc_dp * m;
-  const int bonus = n * maxdp_dp;
-  return (bonus - offset) * 16;
-}
-
 int chroma_depth_for_block(int sum_depth, int sample_count) {
   return clamp_logo_depth((sum_depth + sample_count / 2) / sample_count);
 }
@@ -169,9 +151,7 @@ const int* LogoPlaneCoefficients::d_row(int y) const noexcept {
 PreparedLogo::PreparedLogo(const DelogoProcessorConfig& config)
   : subsampling_w_(config.subsampling_w),
     subsampling_h_(config.subsampling_h),
-    cutoff_(config.cutoff),
-    canonical_(config.backend == RowKernelBackend::Scalar),
-    erase_(config.operation == LogoOperation::Erase) {
+    cutoff_(config.cutoff) {
   LogoImage image = read_logo_file(config.logofile, config.logoname);
   source_header_ = image.header;
   auto shifted = shift_logo(std::move(image), config.left, config.top);
@@ -222,19 +202,9 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
         pixel.dp_cb = 0;
         pixel.dp_cr = 0;
       }
-      if (canonical_) {
-        pixel.dp_y = clamp_logo_depth(pixel.dp_y);
-        y_c[x] = luma_to_internal_color(pixel.y);
-        y_d[x] = pixel.dp_y;
-      } else {
-        if (pixel.dp_y >= LOGO_MAX_DP) {
-          pixel.dp_y = LOGO_MAX_DP - 1;
-        }
-        y_c[x] = auyc_to_yc(pixel.y, pixel.dp_y);
-        y_d[x] = erase_
-          ? (1 << 28) / (LOGO_MAX_DP - pixel.dp_y)
-          : (LOGO_MAX_DP - pixel.dp_y) << 2;
-      }
+      pixel.dp_y = clamp_logo_depth(pixel.dp_y);
+      y_c[x] = luma_to_internal_color(pixel.y);
+      y_d[x] = pixel.dp_y;
       if (mono) {
         pixel.cb = 0;
         pixel.cr = 0;
@@ -264,80 +234,33 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
       int ud = 0;
       int vc = 0;
       int vd = 0;
-      if (canonical_) {
-        std::int64_t weighted_uc = 0;
-        std::int64_t weighted_vc = 0;
-        int sample_count = 0;
+      std::int64_t weighted_uc = 0;
+      std::int64_t weighted_vc = 0;
+      int sample_count = 0;
 
-        for (int by = 0; by < hstep; ++by) {
-          for (int bx = 0; bx < wstep; ++bx) {
-            const LOGO_PIXEL& pixel =
-              image.pixels[static_cast<std::size_t>(y + by) * logo_header_.w + x + bx];
-            const int sample_ud = clamp_logo_depth(pixel.dp_cb);
-            const int sample_vd = clamp_logo_depth(pixel.dp_cr);
-            ud += sample_ud;
-            vd += sample_vd;
-            weighted_uc += static_cast<std::int64_t>(pixel.cb) * sample_ud;
-            weighted_vc += static_cast<std::int64_t>(pixel.cr) * sample_vd;
-            ++sample_count;
-          }
+      for (int by = 0; by < hstep; ++by) {
+        for (int bx = 0; bx < wstep; ++bx) {
+          const LOGO_PIXEL& pixel =
+            image.pixels[static_cast<std::size_t>(y + by) * logo_header_.w + x + bx];
+          const int sample_ud = clamp_logo_depth(pixel.dp_cb);
+          const int sample_vd = clamp_logo_depth(pixel.dp_cr);
+          ud += sample_ud;
+          vd += sample_vd;
+          weighted_uc += static_cast<std::int64_t>(pixel.cb) * sample_ud;
+          weighted_vc += static_cast<std::int64_t>(pixel.cr) * sample_vd;
+          ++sample_count;
         }
-
-        uc = chroma_color_for_block(weighted_uc, ud);
-        vc = chroma_color_for_block(weighted_vc, vd);
-        ud = chroma_depth_for_block(ud, sample_count);
-        vd = chroma_depth_for_block(vd, sample_count);
-
-        u_c_row[dst_x] = chroma_to_internal_color(uc);
-        v_c_row[dst_x] = chroma_to_internal_color(vc);
-        u_d_row[dst_x] = ud;
-        v_d_row[dst_x] = vd;
-        continue;
       }
 
-      uc = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].cb;
-      ud = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].dp_cb;
-      vc = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].cr;
-      vd = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].dp_cr;
+      uc = chroma_color_for_block(weighted_uc, ud);
+      vc = chroma_color_for_block(weighted_vc, vd);
+      ud = chroma_depth_for_block(ud, sample_count);
+      vd = chroma_depth_for_block(vd, sample_count);
 
-      if (subsampling_w_) {
-        uc += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].cb;
-        ud += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].dp_cb;
-        vc += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].cr;
-        vd += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].dp_cr;
-      }
-      if (subsampling_h_) {
-        uc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].cb;
-        ud += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].dp_cb;
-        vc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].cr;
-        vd += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].dp_cr;
-      }
-      if (subsampling_w_ && subsampling_h_) {
-        uc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].cb;
-        ud += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].dp_cb;
-        vc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].cr;
-        vd += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].dp_cr;
-      }
-
-      if (erase_) {
-        u_d_row[dst_x] = (1 << 30) /
-          ((LOGO_MAX_DP << 2) - (ud << (2 - subsampling_w_ - subsampling_h_)));
-        v_d_row[dst_x] = (1 << 30) /
-          ((LOGO_MAX_DP << 2) - (vd << (2 - subsampling_w_ - subsampling_h_)));
-      } else {
-        u_d_row[dst_x] =
-          (LOGO_MAX_DP << 2) - (ud << (2 - subsampling_w_ - subsampling_h_));
-        v_d_row[dst_x] =
-          (LOGO_MAX_DP << 2) - (vd << (2 - subsampling_w_ - subsampling_h_));
-      }
-
-      uc = uc / wstep / hstep;
-      ud = ud / wstep / hstep;
-      vc = vc / wstep / hstep;
-      vd = vd / wstep / hstep;
-
-      u_c_row[dst_x] = aucc_to_cc(uc, ud);
-      v_c_row[dst_x] = aucc_to_cc(vc, vd);
+      u_c_row[dst_x] = chroma_to_internal_color(uc);
+      v_c_row[dst_x] = chroma_to_internal_color(vc);
+      u_d_row[dst_x] = ud;
+      v_d_row[dst_x] = vd;
     }
   }
 }

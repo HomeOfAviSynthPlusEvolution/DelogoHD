@@ -1,6 +1,7 @@
 #include "core/delogo_processor.hpp"
 
 #include "core/canonical_math.hpp"
+#include "core/reciprocal_math.hpp"
 #include "core/row_kernel.hpp"
 
 #include <algorithm>
@@ -11,47 +12,6 @@ namespace delogohd::core {
 namespace {
 
 constexpr double kOpaqueThreshold = 1.0 - 1e-2;
-constexpr double kTransparentThreshold = 1e-2;
-
-int auyc_to_fade_yc(int y_color, int y_dp, double opacity) {
-  const int n = 67584;
-  if (opacity > kOpaqueThreshold) {
-    return y_color;
-  }
-  if (opacity < kTransparentThreshold) {
-    return 0;
-  }
-
-  const int auy_dp = LOGO_MAX_DP - y_dp / 4;
-  const int bonus = n * y_dp / 4;
-  const int offset = bonus - y_color;
-  int cpm = offset - n * LOGO_MAX_DP;
-  cpm = static_cast<int>(cpm * opacity);
-
-  const int faded_offset = n * LOGO_MAX_DP + cpm;
-  const int faded_bonus = static_cast<int>(n * (LOGO_MAX_DP - auy_dp * opacity));
-  return faded_bonus - faded_offset;
-}
-
-int aucc_to_fade_cc(int c_color, int c_dp, double opacity) {
-  const int n = 32896;
-  if (opacity > kOpaqueThreshold) {
-    return c_color;
-  }
-  if (opacity < kTransparentThreshold) {
-    return 0;
-  }
-
-  const int auc_dp = LOGO_MAX_DP - c_dp / 4;
-  const int bonus = n * c_dp / 4;
-  const int offset = bonus - c_color / 16;
-  int cpm = offset - n * LOGO_MAX_DP;
-  cpm = static_cast<int>(cpm * opacity);
-
-  const int faded_offset = n * LOGO_MAX_DP + cpm;
-  const int faded_bonus = static_cast<int>(n * (LOGO_MAX_DP - auc_dp * opacity));
-  return (faded_bonus - faded_offset) * 16;
-}
 
 template <class Pixel>
 void process_add_fade_row(
@@ -60,39 +20,15 @@ void process_add_fade_row(
   const int* array_c,
   const int* array_d,
   int bit_depth,
-  int plane,
   double opacity,
   RowKernelBackend backend
 ) {
   const int pixel_max = (1 << bit_depth) - 1;
-  if (backend == RowKernelBackend::Scalar) {
-    for (int j = 0; j < upbound; ++j) {
-      const int depth = scaled_depth(array_d[j], opacity);
-      const int data = apply_add_alpha(cellptr[j], array_c[j], depth, bit_depth);
-      cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
-    }
-    return;
-  }
-
-  const int shift = 18 - bit_depth;
   for (int j = 0; j < upbound; ++j) {
-    int data = cellptr[j];
-    data <<= shift;
-    int c = array_c[j];
-    int d = array_d[j];
-    if (plane == 0) {
-      c = auyc_to_fade_yc(c, d, opacity);
-    } else {
-      c = aucc_to_fade_cc(c, d, opacity);
-    }
-    d = static_cast<int>(LOGO_MAX_DP * 4 * (1 - opacity) + d * opacity);
-    data = (data * d - c) / LOGO_MAX_DP;
-    if (data < 0) {
-      data = 0;
-    }
-    data >>= shift;
-    data++;
-    data >>= 2;
+    const int depth = scaled_depth(array_d[j], opacity);
+    const int data = backend == RowKernelBackend::Scalar
+      ? apply_add_alpha(cellptr[j], array_c[j], depth, bit_depth)
+      : apply_add_alpha_reciprocal(cellptr[j], array_c[j], depth, bit_depth);
     cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
   }
 }
@@ -104,39 +40,15 @@ void process_erase_fade_row(
   const int* array_c,
   const int* array_d,
   int bit_depth,
-  int plane,
   double opacity,
   RowKernelBackend backend
 ) {
   const int pixel_max = (1 << bit_depth) - 1;
-  if (backend == RowKernelBackend::Scalar) {
-    for (int j = 0; j < upbound; ++j) {
-      const int depth = scaled_depth(array_d[j], opacity);
-      const int data = apply_erase_alpha(cellptr[j], array_c[j], depth, bit_depth);
-      cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
-    }
-    return;
-  }
-
-  const int shift = 20 - bit_depth;
   for (int j = 0; j < upbound; ++j) {
-    int data = cellptr[j];
-    data <<= shift;
-    int c = array_c[j];
-    int d = (1 << 30) / array_d[j];
-    if (plane == 0) {
-      c = auyc_to_fade_yc(c, d, opacity);
-    } else {
-      c = aucc_to_fade_cc(c, d, opacity);
-    }
-    d = static_cast<int>(LOGO_MAX_DP * 4 * (1 - opacity) + d * opacity);
-    data = (data * LOGO_MAX_DP + c) / d;
-    if (data < 0) {
-      data = 0;
-    }
-    data >>= shift - 4;
-    data++;
-    data >>= 2;
+    const int depth = scaled_depth(array_d[j], opacity);
+    const int data = backend == RowKernelBackend::Scalar
+      ? apply_erase_alpha(cellptr[j], array_c[j], depth, bit_depth)
+      : apply_erase_alpha_reciprocal(cellptr[j], array_c[j], depth, bit_depth);
     cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
   }
 }
@@ -231,7 +143,6 @@ void DelogoProcessor::process_plane(
           coefficients.c_row(i),
           coefficients.d_row(i),
           bit_depth_,
-          plane_index,
           opacity,
           backend_
         );
@@ -242,7 +153,6 @@ void DelogoProcessor::process_plane(
           coefficients.c_row(i),
           coefficients.d_row(i),
           bit_depth_,
-          plane_index,
           opacity,
           backend_
         );
