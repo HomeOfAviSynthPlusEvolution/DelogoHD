@@ -13,7 +13,7 @@ include(FetchContent)
 FetchContent_Declare(
   highway
   GIT_REPOSITORY https://github.com/google/highway.git
-  GIT_TAG 1.3.0
+  GIT_TAG 1.4.0
 )
 set(HWY_ENABLE_CONTRIB OFF CACHE BOOL "" FORCE)
 set(HWY_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
