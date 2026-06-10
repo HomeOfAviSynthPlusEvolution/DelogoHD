@@ -217,8 +217,6 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
         State{std::move(processor), parsed}
       }
     );
-  } catch (const char* error) {
-    return ds::Result<ds::VideoInitStateResult<State>>::failure(invalid_argument(error));
   } catch (const std::exception& error) {
     return ds::Result<ds::VideoInitStateResult<State>>::failure(invalid_argument(error.what()));
   } catch (...) {
@@ -255,8 +253,6 @@ ds::Result<ds::VideoProcessResult> LogoCore<Operation>::process(ds::VideoProcess
     state.processor->process(context.dst, opacity);
 
     return ds::Result<ds::VideoProcessResult>::success(ds::VideoProcessResult{});
-  } catch (const char* error) {
-    return ds::Result<ds::VideoProcessResult>::failure(invalid_argument(error));
   } catch (const std::exception& error) {
     return ds::Result<ds::VideoProcessResult>::failure(invalid_argument(error.what()));
   } catch (...) {

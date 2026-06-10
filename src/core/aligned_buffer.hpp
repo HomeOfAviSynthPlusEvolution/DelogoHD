@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <span>
+#include <stdexcept>
 #include <utility>
 
 #if defined(_WIN32)
@@ -56,7 +57,7 @@ public:
     data_ = static_cast<T*>(std::aligned_alloc(Alignment, aligned_bytes));
 #endif
     if (!data_) {
-      throw "unable to allocate memory";
+      throw std::runtime_error("unable to allocate memory");
     }
     std::memset(data_, 0, bytes);
   }
