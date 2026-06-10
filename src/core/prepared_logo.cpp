@@ -1,0 +1,290 @@
+#include "core/prepared_logo.hpp"
+
+#include "core/delogo_processor.hpp"
+
+#include <cstring>
+#include <optional>
+
+namespace delogohd::core {
+
+namespace {
+
+int auyc_to_yc(int auy_color, int auy_dp) {
+  const int m = 219;
+  const int n = 67584;
+  const int maxdp_dp = LOGO_MAX_DP - auy_dp;
+  const int offset = n * LOGO_MAX_DP + auy_color * auy_dp * m;
+  const int bonus = n * maxdp_dp;
+  return bonus - offset;
+}
+
+int aucc_to_cc(int auc_color, int auc_dp) {
+  const int m = 14;
+  const int n = 32896;
+  const int maxdp_dp = LOGO_MAX_DP - auc_dp;
+  const int offset = n * LOGO_MAX_DP + auc_color * auc_dp * m;
+  const int bonus = n * maxdp_dp;
+  return (bonus - offset) * 16;
+}
+
+std::optional<LogoImage> shift_logo(LogoImage image, int left, int top) {
+  const int oldl = image.header.x + left;
+  const int oldt = image.header.y + top;
+
+  int newl = oldl;
+  int newt = oldt;
+  int neww = image.header.w;
+  int newh = image.header.h;
+  int padl = 0;
+  int padt = 0;
+
+  if (oldl < 0) {
+    newl = 0;
+    padl = oldl;
+  } else if ((padl = oldl % kMinModulo) != 0) {
+    newl = oldl - padl;
+  }
+
+  if (oldt < 0) {
+    newt = 0;
+    padt = oldt;
+  } else if ((padt = oldt % 2) != 0) {
+    newt = oldt - padt;
+  }
+
+  neww += padl;
+  neww += ((kMinModulo - 1) & ~(neww - 1));
+  if (neww <= 0) {
+    return std::nullopt;
+  }
+
+  newh += padt;
+  newh += newh % 2;
+  if (newh <= 0) {
+    return std::nullopt;
+  }
+
+  if (
+    newl == oldl &&
+    newt == oldt &&
+    neww == image.header.w &&
+    newh == image.header.h
+  ) {
+    return image;
+  }
+
+  int src_h = 0;
+  int dst_h = 0;
+  int len_h = 0;
+  if (padl >= 0) {
+    src_h = 0;
+    dst_h = padl;
+    len_h = image.header.w;
+  } else {
+    src_h = -padl;
+    dst_h = 0;
+    len_h = image.header.w + padl;
+  }
+
+  int src_v = 0;
+  int dst_v = 0;
+  int len_v = 0;
+  if (padt >= 0) {
+    src_v = 0;
+    dst_v = padt;
+    len_v = image.header.h;
+  } else {
+    src_v = -padt;
+    dst_v = 0;
+    len_v = image.header.h + padt;
+  }
+
+  std::vector<LOGO_PIXEL> shifted(static_cast<std::size_t>(neww) * newh);
+  for (int y = 0; y < len_v; ++y) {
+    std::memcpy(
+      shifted.data() + dst_h + static_cast<std::size_t>(y + dst_v) * neww,
+      image.pixels.data() + src_h + static_cast<std::size_t>(y + src_v) * image.header.w,
+      static_cast<std::size_t>(len_h) * sizeof(LOGO_PIXEL)
+    );
+  }
+
+  image.header.w = static_cast<int16_t>(neww);
+  image.header.h = static_cast<int16_t>(newh);
+  image.header.x = static_cast<int16_t>(newl);
+  image.header.y = static_cast<int16_t>(newt);
+  image.pixels = std::move(shifted);
+  return image;
+}
+
+} // namespace
+
+void LogoPlaneCoefficients::reset(int width, int height) {
+  width_ = width;
+  height_ = height;
+  c_.reset(static_cast<std::size_t>(width_) * height_);
+  d_.reset(static_cast<std::size_t>(width_) * height_);
+}
+
+bool LogoPlaneCoefficients::active() const noexcept {
+  return c_.data() != nullptr && d_.data() != nullptr;
+}
+
+int LogoPlaneCoefficients::width() const noexcept {
+  return width_;
+}
+
+int LogoPlaneCoefficients::height() const noexcept {
+  return height_;
+}
+
+int* LogoPlaneCoefficients::c_row(int y) noexcept {
+  return c_.data() + static_cast<std::size_t>(y) * width_;
+}
+
+int* LogoPlaneCoefficients::d_row(int y) noexcept {
+  return d_.data() + static_cast<std::size_t>(y) * width_;
+}
+
+const int* LogoPlaneCoefficients::c_row(int y) const noexcept {
+  return c_.data() + static_cast<std::size_t>(y) * width_;
+}
+
+const int* LogoPlaneCoefficients::d_row(int y) const noexcept {
+  return d_.data() + static_cast<std::size_t>(y) * width_;
+}
+
+PreparedLogo::PreparedLogo(const DelogoProcessorConfig& config)
+  : subsampling_w_(config.subsampling_w),
+    subsampling_h_(config.subsampling_h),
+    cutoff_(config.cutoff),
+    erase_(config.operation == LogoOperation::Erase) {
+  LogoImage image = read_logo_file(config.logofile, config.logoname);
+  source_header_ = image.header;
+  auto shifted = shift_logo(std::move(image), config.left, config.top);
+  if (!shifted.has_value()) {
+    logo_header_ = source_header_;
+    return;
+  }
+
+  logo_header_ = shifted->header;
+  convert(*shifted, config.mono);
+  active_ = true;
+}
+
+bool PreparedLogo::active() const noexcept {
+  return active_;
+}
+
+const LOGO_HEADER& PreparedLogo::source_header() const noexcept {
+  return source_header_;
+}
+
+const LOGO_HEADER& PreparedLogo::logo_header() const noexcept {
+  return logo_header_;
+}
+
+const LogoPlaneCoefficients& PreparedLogo::plane(int index) const noexcept {
+  return planes_[index];
+}
+
+int PreparedLogo::subsampling_w() const noexcept {
+  return subsampling_w_;
+}
+
+int PreparedLogo::subsampling_h() const noexcept {
+  return subsampling_h_;
+}
+
+void PreparedLogo::convert(LogoImage& image, bool mono) {
+  planes_[0].reset(logo_header_.w, logo_header_.h);
+  for (int y = 0; y < logo_header_.h; ++y) {
+    int* y_c = planes_[0].c_row(y);
+    int* y_d = planes_[0].d_row(y);
+    for (int x = 0; x < logo_header_.w; ++x) {
+      const auto index = static_cast<std::size_t>(y) * logo_header_.w + x;
+      LOGO_PIXEL& pixel = image.pixels[index];
+      if (pixel.dp_y < cutoff_) {
+        pixel.dp_y = 0;
+        pixel.dp_cb = 0;
+        pixel.dp_cr = 0;
+      }
+      if (pixel.dp_y >= LOGO_MAX_DP) {
+        pixel.dp_y = LOGO_MAX_DP - 1;
+      }
+      y_c[x] = auyc_to_yc(pixel.y, pixel.dp_y);
+      y_d[x] = erase_
+        ? (1 << 28) / (LOGO_MAX_DP - pixel.dp_y)
+        : (LOGO_MAX_DP - pixel.dp_y) << 2;
+      if (mono) {
+        pixel.cb = 0;
+        pixel.cr = 0;
+        pixel.dp_cb = pixel.dp_y;
+        pixel.dp_cr = pixel.dp_y;
+      }
+    }
+  }
+
+  const int wstep = 1 << subsampling_w_;
+  const int hstep = 1 << subsampling_h_;
+  const int chroma_width = logo_header_.w >> subsampling_w_;
+  const int chroma_height = logo_header_.h >> subsampling_h_;
+  planes_[1].reset(chroma_width, chroma_height);
+  planes_[2].reset(chroma_width, chroma_height);
+
+  for (int y = 0; y < logo_header_.h; y += hstep) {
+    const int dst_y = y / hstep;
+    int* u_c_row = planes_[1].c_row(dst_y);
+    int* u_d_row = planes_[1].d_row(dst_y);
+    int* v_c_row = planes_[2].c_row(dst_y);
+    int* v_d_row = planes_[2].d_row(dst_y);
+
+    for (int x = 0; x < logo_header_.w; x += wstep) {
+      const int dst_x = x / wstep;
+      int uc = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].cb;
+      int ud = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].dp_cb;
+      int vc = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].cr;
+      int vd = image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x].dp_cr;
+
+      if (subsampling_w_) {
+        uc += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].cb;
+        ud += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].dp_cb;
+        vc += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].cr;
+        vd += image.pixels[static_cast<std::size_t>(y) * logo_header_.w + x + 1].dp_cr;
+      }
+      if (subsampling_h_) {
+        uc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].cb;
+        ud += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].dp_cb;
+        vc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].cr;
+        vd += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x].dp_cr;
+      }
+      if (subsampling_w_ && subsampling_h_) {
+        uc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].cb;
+        ud += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].dp_cb;
+        vc += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].cr;
+        vd += image.pixels[static_cast<std::size_t>(y + 1) * logo_header_.w + x + 1].dp_cr;
+      }
+
+      if (erase_) {
+        u_d_row[dst_x] = (1 << 30) /
+          ((LOGO_MAX_DP << 2) - (ud << (2 - subsampling_w_ - subsampling_h_)));
+        v_d_row[dst_x] = (1 << 30) /
+          ((LOGO_MAX_DP << 2) - (vd << (2 - subsampling_w_ - subsampling_h_)));
+      } else {
+        u_d_row[dst_x] =
+          (LOGO_MAX_DP << 2) - (ud << (2 - subsampling_w_ - subsampling_h_));
+        v_d_row[dst_x] =
+          (LOGO_MAX_DP << 2) - (vd << (2 - subsampling_w_ - subsampling_h_));
+      }
+
+      uc = uc / wstep / hstep;
+      ud = ud / wstep / hstep;
+      vc = vc / wstep / hstep;
+      vd = vd / wstep / hstep;
+
+      u_c_row[dst_x] = aucc_to_cc(uc, ud);
+      v_c_row[dst_x] = aucc_to_cc(vc, vd);
+    }
+  }
+}
+
+} // namespace delogohd::core

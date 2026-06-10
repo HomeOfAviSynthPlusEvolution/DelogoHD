@@ -70,16 +70,20 @@ set(DELOGOHD_SOURCES
   src/plugin/plugin_entry.cpp
   src/plugin/delogohd_filter.cpp
   src/plugin/delogohd_filter.hpp
-  src/core/delogo_engine.add.cpp
-  src/core/delogo_engine.erase.cpp
-  src/core/delogo_engine.preprocess.cpp
-  src/core/delogo_engine.hpp
+  src/core/aligned_buffer.hpp
+  src/core/delogo_processor.cpp
+  src/core/delogo_processor.hpp
   src/core/logo.h
+  src/core/logo_file.cpp
+  src/core/logo_file.hpp
+  src/core/prepared_logo.cpp
+  src/core/prepared_logo.hpp
+  src/core/row_kernel_c.cpp
+  src/core/row_kernel.hpp
 )
 if(NOT DELOGOHD_PURE_C)
   list(APPEND DELOGOHD_SOURCES
-    src/core/delogo_engine.add_sse4.cpp
-    src/core/delogo_engine.erase_sse4.cpp
+    src/core/row_kernel_sse4.cpp
   )
 endif()
 if(WIN32)

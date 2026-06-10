@@ -1,0 +1,44 @@
+#pragma once
+
+#include <dualsynth/frame.hpp>
+
+#include "core/prepared_logo.hpp"
+
+namespace delogohd::core {
+
+enum class LogoOperation {
+  Add,
+  Erase,
+};
+
+struct DelogoProcessorConfig {
+  LogoOperation operation = LogoOperation::Erase;
+  const char* logofile = nullptr;
+  const char* logoname = nullptr;
+  int bit_depth = 8;
+  int subsampling_w = 1;
+  int subsampling_h = 1;
+  int left = 0;
+  int top = 0;
+  bool mono = false;
+  int cutoff = 0;
+};
+
+class DelogoProcessor {
+public:
+  explicit DelogoProcessor(const DelogoProcessorConfig& config);
+
+  const LOGO_HEADER& source_header() const noexcept;
+
+  void process(ds::MutableVideoFrameView& frame, double opacity);
+
+private:
+  template <class Pixel>
+  void process_plane(ds::MutablePlaneView& plane, int plane_index, double opacity);
+
+  LogoOperation operation_;
+  int bit_depth_;
+  PreparedLogo logo_;
+};
+
+} // namespace delogohd::core

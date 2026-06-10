@@ -6,7 +6,7 @@
 #include <dualsynth/video_bridge.hpp>
 #include <dualsynth/video_filter.hpp>
 
-#include "core/delogo_engine.hpp"
+#include "core/delogo_processor.hpp"
 #include "version.hpp"
 
 #include <climits>
@@ -14,9 +14,10 @@
 
 namespace delogohd {
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 struct LogoCore {
-  static constexpr const char* name = Operation == ERASE_LOGO ? "DelogoHD" : "AddlogoHD";
+  static constexpr const char* name =
+    Operation == core::LogoOperation::Erase ? "DelogoHD" : "AddlogoHD";
   static constexpr int input_count = 1;
   static constexpr ds::OutputOrigin output_origin = ds::OutputOrigin::take_from_input(0);
 
@@ -31,7 +32,7 @@ struct LogoCore {
 
   struct State {
     State();
-    State(std::unique_ptr<DelogoEngine<Operation>> engine, Parameters params);
+    State(std::unique_ptr<core::DelogoProcessor> processor, Parameters params);
     ~State();
 
     State(State&&) noexcept;
@@ -39,7 +40,7 @@ struct LogoCore {
     State(const State&) = delete;
     State& operator=(const State&) = delete;
 
-    std::unique_ptr<DelogoEngine<Operation>> engine;
+    std::unique_ptr<core::DelogoProcessor> processor;
     Parameters params;
   };
 
@@ -49,11 +50,11 @@ struct LogoCore {
   static int cache_hints(ds::VideoCacheHintsContext& context);
 };
 
-struct DelogoHDCore : LogoCore<ERASE_LOGO> {
+struct DelogoHDCore : LogoCore<core::LogoOperation::Erase> {
   static constexpr const char* name = "DelogoHD";
 };
 
-struct AddlogoHDCore : LogoCore<ADD_LOGO> {
+struct AddlogoHDCore : LogoCore<core::LogoOperation::Add> {
   static constexpr const char* name = "AddlogoHD";
 };
 

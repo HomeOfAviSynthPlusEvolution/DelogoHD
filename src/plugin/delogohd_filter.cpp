@@ -105,27 +105,27 @@ ds::FilterDescriptor make_descriptor(std::string name) {
 
 } // namespace
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 LogoCore<Operation>::State::State() = default;
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 LogoCore<Operation>::State::State(
-  std::unique_ptr<DelogoEngine<Operation>> input_engine,
+  std::unique_ptr<core::DelogoProcessor> input_processor,
   Parameters input_params
-) : engine(std::move(input_engine)),
+) : processor(std::move(input_processor)),
     params(input_params) {}
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 LogoCore<Operation>::State::~State() = default;
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 LogoCore<Operation>::State::State(State&&) noexcept = default;
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 typename LogoCore<Operation>::State& LogoCore<Operation>::State::operator=(State&&) noexcept =
   default;
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 ds::Result<ds::VideoInitStateResult<typename LogoCore<Operation>::State>>
 LogoCore<Operation>::init(ds::VideoInitContext& context) {
   try {
@@ -178,31 +178,36 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
     parsed.fadeout = fadeout.value();
 
     const ds::VideoInputInfo& input = inputs.value()[0];
-    auto engine = std::make_unique<DelogoEngine<Operation>>(
-      logofile.value()->c_str(),
-      logoname.value().has_value() ? logoname.value()->c_str() : nullptr,
-      ds::bits_per_sample(input.format.sample_format),
-      input.format.subsampling_w,
-      input.format.subsampling_h,
-      parsed.left,
-      parsed.top,
-      mono.value(),
-      cutoff.value()
-    );
+    core::DelogoProcessorConfig processor_config{};
+    processor_config.operation = Operation;
+    processor_config.logofile = logofile.value()->c_str();
+    processor_config.logoname = logoname.value().has_value()
+      ? logoname.value()->c_str()
+      : nullptr;
+    processor_config.bit_depth = ds::bits_per_sample(input.format.sample_format);
+    processor_config.subsampling_w = input.format.subsampling_w;
+    processor_config.subsampling_h = input.format.subsampling_h;
+    processor_config.left = parsed.left;
+    processor_config.top = parsed.top;
+    processor_config.mono = mono.value();
+    processor_config.cutoff = cutoff.value();
 
-    auto set_result = context.set_host_var("delogohd_left", engine->src_logoheader.x);
+    auto processor = std::make_unique<core::DelogoProcessor>(processor_config);
+    const LOGO_HEADER& source_header = processor->source_header();
+
+    auto set_result = context.set_host_var("delogohd_left", source_header.x);
     if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
-    set_result = context.set_host_var("delogohd_top", engine->src_logoheader.y);
+    set_result = context.set_host_var("delogohd_top", source_header.y);
     if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
-    set_result = context.set_host_var("delogohd_width", engine->src_logoheader.w);
+    set_result = context.set_host_var("delogohd_width", source_header.w);
     if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
-    set_result = context.set_host_var("delogohd_height", engine->src_logoheader.h);
+    set_result = context.set_host_var("delogohd_height", source_header.h);
     if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
 
     return ds::Result<ds::VideoInitStateResult<State>>::success(
       ds::VideoInitStateResult<State>{
         ds::VideoOutputInfo{input.width, input.height, input.num_frames, input.format, input.fps},
-        State{std::move(engine), parsed}
+        State{std::move(processor), parsed}
       }
     );
   } catch (const char* error) {
@@ -216,12 +221,12 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
   }
 }
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 ds::Result<ds::VideoRequestResult> LogoCore<Operation>::request(ds::VideoRequestContext&) {
   return ds::Result<ds::VideoRequestResult>::success(ds::VideoRequestResult{});
 }
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 ds::Result<ds::VideoProcessResult> LogoCore<Operation>::process(ds::VideoProcessContext& context) {
   try {
     State& state = context.state<State>();
@@ -240,31 +245,7 @@ ds::Result<ds::VideoProcessResult> LogoCore<Operation>::process(ds::VideoProcess
       return ds::Result<ds::VideoProcessResult>::success(ds::VideoProcessResult{});
     }
 
-    if (context.dst.format.sample_format == ds::SampleFormat::UInt8) {
-      for (int plane = 0; plane < 3; ++plane) {
-        auto& dst_plane = context.dst.plane(plane);
-        state.engine->template processImage<std::uint8_t>(
-          static_cast<unsigned char*>(dst_plane.data),
-          static_cast<int>(dst_plane.stride_bytes),
-          dst_plane.width,
-          dst_plane.height,
-          plane,
-          opacity
-        );
-      }
-    } else {
-      for (int plane = 0; plane < 3; ++plane) {
-        auto& dst_plane = context.dst.plane(plane);
-        state.engine->template processImage<std::uint16_t>(
-          static_cast<unsigned char*>(dst_plane.data),
-          static_cast<int>(dst_plane.stride_bytes),
-          dst_plane.width,
-          dst_plane.height,
-          plane,
-          opacity
-        );
-      }
-    }
+    state.processor->process(context.dst, opacity);
 
     return ds::Result<ds::VideoProcessResult>::success(ds::VideoProcessResult{});
   } catch (const char* error) {
@@ -278,7 +259,7 @@ ds::Result<ds::VideoProcessResult> LogoCore<Operation>::process(ds::VideoProcess
   }
 }
 
-template <EOperation Operation>
+template <core::LogoOperation Operation>
 int LogoCore<Operation>::cache_hints(ds::VideoCacheHintsContext& context) {
   return context.default_response;
 }
@@ -297,8 +278,8 @@ ds::FilterDescriptor LogoBridgeBase<Core>::descriptor() {
   return make_descriptor(Core::name);
 }
 
-template struct LogoCore<ERASE_LOGO>;
-template struct LogoCore<ADD_LOGO>;
+template struct LogoCore<core::LogoOperation::Erase>;
+template struct LogoCore<core::LogoOperation::Add>;
 template struct LogoBridgeBase<DelogoHDCore>;
 template struct LogoBridgeBase<AddlogoHDCore>;
 

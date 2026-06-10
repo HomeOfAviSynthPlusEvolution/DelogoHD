@@ -1,0 +1,101 @@
+#pragma once
+
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
+#include <utility>
+
+#if defined(_WIN32)
+#include <malloc.h>
+#endif
+
+namespace delogohd::core {
+
+template <class T, std::size_t Alignment>
+class AlignedBuffer {
+public:
+  AlignedBuffer() = default;
+
+  explicit AlignedBuffer(std::size_t count) {
+    reset(count);
+  }
+
+  ~AlignedBuffer() {
+    release();
+  }
+
+  AlignedBuffer(const AlignedBuffer&) = delete;
+  AlignedBuffer& operator=(const AlignedBuffer&) = delete;
+
+  AlignedBuffer(AlignedBuffer&& other) noexcept
+    : data_(std::exchange(other.data_, nullptr)),
+      count_(std::exchange(other.count_, 0)) {}
+
+  AlignedBuffer& operator=(AlignedBuffer&& other) noexcept {
+    if (this != &other) {
+      release();
+      data_ = std::exchange(other.data_, nullptr);
+      count_ = std::exchange(other.count_, 0);
+    }
+    return *this;
+  }
+
+  void reset(std::size_t count) {
+    release();
+    count_ = count;
+    if (count_ == 0) {
+      return;
+    }
+
+    const std::size_t bytes = count_ * sizeof(T);
+#if defined(_WIN32)
+    data_ = static_cast<T*>(_aligned_malloc(bytes, Alignment));
+#else
+    const std::size_t aligned_bytes = ((bytes + Alignment - 1) / Alignment) * Alignment;
+    data_ = static_cast<T*>(std::aligned_alloc(Alignment, aligned_bytes));
+#endif
+    if (!data_) {
+      throw "unable to allocate memory";
+    }
+    std::memset(data_, 0, bytes);
+  }
+
+  T* data() noexcept {
+    return data_;
+  }
+
+  const T* data() const noexcept {
+    return data_;
+  }
+
+  std::size_t size() const noexcept {
+    return count_;
+  }
+
+  T& operator[](std::size_t index) noexcept {
+    return data_[index];
+  }
+
+  const T& operator[](std::size_t index) const noexcept {
+    return data_[index];
+  }
+
+private:
+  void release() noexcept {
+    if (!data_) {
+      return;
+    }
+#if defined(_WIN32)
+    _aligned_free(data_);
+#else
+    std::free(data_);
+#endif
+    data_ = nullptr;
+    count_ = 0;
+  }
+
+  T* data_ = nullptr;
+  std::size_t count_ = 0;
+};
+
+} // namespace delogohd::core
