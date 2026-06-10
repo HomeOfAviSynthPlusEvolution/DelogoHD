@@ -137,9 +137,9 @@ void process_opaque_row(
   }
 #else
   if (operation == LogoOperation::Add) {
-    process_add_row_sse4(cellptr, upbound, array_c, array_d, bit_depth);
+    process_add_row_hwy(cellptr, upbound, array_c, array_d, bit_depth);
   } else {
-    process_erase_row_sse4(cellptr, upbound, array_c, array_d, bit_depth);
+    process_erase_row_hwy(cellptr, upbound, array_c, array_d, bit_depth);
   }
 #endif
 }

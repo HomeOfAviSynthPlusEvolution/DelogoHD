@@ -11,6 +11,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
+if(NOT DELOGOHD_PURE_C)
+  FetchContent_Declare(
+    highway
+    GIT_REPOSITORY https://github.com/google/highway.git
+    GIT_TAG 1.3.0
+  )
+  set(HWY_ENABLE_CONTRIB OFF CACHE BOOL "" FORCE)
+  set(HWY_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+  set(HWY_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+  set(HWY_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(highway)
+endif()
+
 set(DS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(DS_BUILD_ACCEPTANCE_PLUGIN OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
@@ -83,7 +96,7 @@ set(DELOGOHD_SOURCES
 )
 if(NOT DELOGOHD_PURE_C)
   list(APPEND DELOGOHD_SOURCES
-    src/core/row_kernel_sse4.cpp
+    src/core/row_kernel_hwy.cpp
   )
 endif()
 if(WIN32)
@@ -110,14 +123,7 @@ target_include_directories(DelogoHD
 )
 
 if(NOT DELOGOHD_PURE_C)
-  target_compile_options(DelogoHD
-    PRIVATE
-      $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-msse4.1>
-      $<$<CXX_COMPILER_ID:Intel>:/arch:SSE4.1>
-  )
-  if(MSVC)
-    target_compile_options(DelogoHD PRIVATE /arch:SSE2)
-  endif()
+  target_link_libraries(DelogoHD PRIVATE hwy)
 endif()
 
 if(NOT WIN32)

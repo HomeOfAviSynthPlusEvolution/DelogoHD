@@ -34,28 +34,28 @@ void process_erase_row_c(
 );
 
 #if !defined(PURE_C)
-void process_add_row_sse4(
+void process_add_row_hwy(
   std::uint8_t* cellptr,
   int upbound,
   const int* array_c,
   const int* array_d,
   int bit_depth
 );
-void process_add_row_sse4(
+void process_add_row_hwy(
   std::uint16_t* cellptr,
   int upbound,
   const int* array_c,
   const int* array_d,
   int bit_depth
 );
-void process_erase_row_sse4(
+void process_erase_row_hwy(
   std::uint8_t* cellptr,
   int upbound,
   const int* array_c,
   const int* array_d,
   int bit_depth
 );
-void process_erase_row_sse4(
+void process_erase_row_hwy(
   std::uint16_t* cellptr,
   int upbound,
   const int* array_c,
