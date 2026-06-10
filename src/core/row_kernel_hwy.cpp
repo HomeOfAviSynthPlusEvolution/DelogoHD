@@ -91,7 +91,7 @@ auto divide_u64_by_reciprocal_table(D64 d64, V64 numerator, V64 denominator) {
     hn::BitCast(di64, denominator)
   );
   auto quotient = hn::ShiftRight<kReciprocalShift>(hn::Mul(numerator, reciprocal));
-  const auto next_quotient = quotient + one;
+  const auto next_quotient = hn::Add(quotient, one);
   const auto needs_increment = hn::Le(hn::Mul(next_quotient, denominator), numerator);
   return hn::IfThenElse(needs_increment, next_quotient, quotient);
 }
@@ -122,7 +122,7 @@ auto sample_from_internal(D64 d64, V64I values) {
   const auto pixel_max = hn::Set(d64, std::uint64_t{(1 << kBitDepth) - 1});
   auto value = hn::BitCast(d64, hn::Max(values, zero_i64));
   value = hn::ShiftRight<18 - kBitDepth>(value);
-  value = hn::ShiftRight<2>(value + one);
+  value = hn::ShiftRight<2>(hn::Add(value, one));
   return hn::Min(value, pixel_max);
 }
 
@@ -147,10 +147,10 @@ std::size_t process_add_row_vector(
     const auto source = hn::BitCast(di64, hn::ShiftLeft<20 - kBitDepth>(sample));
     const auto color = hn::PromoteTo(di64, hn::LoadN(di32, colors.data() + j, lane_count));
     const auto depth = hn::PromoteTo(di64, hn::LoadN(di32, depths.data() + j, lane_count));
-    const auto remaining = logo_max - depth;
+    const auto remaining = hn::Sub(logo_max, depth);
     auto numerator = hn::Mul(source, remaining);
-    numerator = numerator + hn::Mul(color, depth);
-    numerator = numerator + round;
+    numerator = hn::Add(numerator, hn::Mul(color, depth));
+    numerator = hn::Add(numerator, round);
 
     const auto mixed = divide_i64_by_reciprocal_table(d64, numerator, logo_max_u);
     const auto value = sample_from_internal<kBitDepth>(d64, mixed);
@@ -182,11 +182,11 @@ std::size_t process_erase_row_vector(
     const auto color = hn::PromoteTo(di64, hn::LoadN(di32, colors.data() + j, lane_count));
     const auto depth = hn::PromoteTo(di64, hn::LoadN(di32, depths.data() + j, lane_count));
     const auto alpha = hn::Min(depth, max_alpha);
-    const auto remaining = logo_max - alpha;
+    const auto remaining = hn::Sub(logo_max, alpha);
 
     auto numerator = hn::Mul(source, logo_max);
-    numerator = numerator - hn::Mul(color, alpha);
-    numerator = numerator + hn::ShiftRight<1>(remaining);
+    numerator = hn::Sub(numerator, hn::Mul(color, alpha));
+    numerator = hn::Add(numerator, hn::ShiftRight<1>(remaining));
 
     const auto restored = divide_i64_by_reciprocal_table(
       d64,
