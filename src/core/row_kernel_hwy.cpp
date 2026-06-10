@@ -2,6 +2,16 @@
 #undef HWY_TARGET_INCLUDE
 #define HWY_TARGET_INCLUDE "core/row_kernel_hwy.cpp"
 
+// These integer row kernels do not use the feature-specific float, dot-product,
+// AES, or BF16 operations that justify Highway's finest-grained dispatch
+// targets. Keep broad SIMD generations and trim specialized variants to reduce
+// binary size.
+#ifndef HWY_DISABLED_TARGETS
+#define HWY_DISABLED_TARGETS                                                \
+  (HWY_SSSE3 | HWY_AVX3_DL | HWY_AVX3_ZEN4 | HWY_AVX3_SPR | HWY_AVX10_2 |   \
+   HWY_NEON_BF16 | HWY_SVE_256 | HWY_SVE2_128)
+#endif
+
 #include "hwy/foreach_target.h"
 #include "hwy/highway.h"
 
