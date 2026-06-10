@@ -1,0 +1,28 @@
+Source: dualsynth-delogohd
+Section: video
+Priority: optional
+Maintainer: Xinyue Lu <i@7086.in>
+Bugs: https://github.com/HomeOfAviSynthPlusEvolution/DelogoHD/issues
+Homepage: https://github.com/HomeOfAviSynthPlusEvolution/DelogoHD
+Build-Depends:
+ ca-certificates,
+ cmake (>= 3.24),
+ debhelper-compat (= 13),
+ g++,
+ git,
+ pkgconf
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: dualsynth-delogohd
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends}
+Description: dual AviSynth+ and VapourSynth logo removal plugin
+ DelogoHD removes or re-applies logos stored in .lgd logo files. The plugin
+ supports planar YUV 4:2:0, 4:2:2, and 4:4:4 clips with 8, 10, 12, 14, or
+ 16-bit integer samples.
+ .
+ This package installs one dualsynth plugin binary and exposes it through both
+ AviSynth+ and VapourSynth plugin directories.

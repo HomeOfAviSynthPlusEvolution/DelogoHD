@@ -1,0 +1,5 @@
+dualsynth-delogohd (13.0.0) unstable; urgency=medium
+
+  * Initial Debian package for refactored version.
+
+ -- Xinyue Lu <i@7086.in>  Wed, 10 Jun 2026 00:00:00 -0700

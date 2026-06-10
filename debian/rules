@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+include /usr/share/dpkg/architecture.mk
+
+CMAKE_BUILD_DIR = build/debian
+PACKAGE_DIR = debian/dualsynth-delogohd
+PLUGIN_LIBDIR = usr/lib/$(DEB_HOST_MULTIARCH)
+PLUGIN_NAME = libDelogoHD.so
+
+%:
+	dh $@ --buildsystem=cmake --builddirectory=$(CMAKE_BUILD_DIR)
+
+override_dh_auto_configure:
+	dh_auto_configure --buildsystem=cmake --builddirectory=$(CMAKE_BUILD_DIR) -- \
+		-DDELOGOHD_BUILD_TEST_TOOLS=OFF \
+		-DDELOGOHD_COPY_RELEASE=OFF
+
+override_dh_auto_install:
+	dh_auto_install --buildsystem=cmake --builddirectory=$(CMAKE_BUILD_DIR)
+	install -D -m 0644 $(CMAKE_BUILD_DIR)/$(PLUGIN_NAME) \
+		$(PACKAGE_DIR)/$(PLUGIN_LIBDIR)/dualsynth/$(PLUGIN_NAME)
+	mkdir -p \
+		$(PACKAGE_DIR)/$(PLUGIN_LIBDIR)/avisynth \
+		$(PACKAGE_DIR)/$(PLUGIN_LIBDIR)/vapoursynth
+	ln -sf ../dualsynth/$(PLUGIN_NAME) \
+		$(PACKAGE_DIR)/$(PLUGIN_LIBDIR)/avisynth/$(PLUGIN_NAME)
+	ln -sf ../dualsynth/$(PLUGIN_NAME) \
+		$(PACKAGE_DIR)/$(PLUGIN_LIBDIR)/vapoursynth/$(PLUGIN_NAME)
