@@ -1,64 +1,57 @@
 #pragma once
 
 #include <cstdint>
+#include <span>
 
 namespace delogohd::core {
 
 void process_add_row_c(
-  std::uint8_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint8_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 void process_add_row_c(
-  std::uint16_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint16_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 void process_erase_row_c(
-  std::uint8_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint8_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 void process_erase_row_c(
-  std::uint16_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint16_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 
 void process_add_row_hwy(
-  std::uint8_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint8_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 void process_add_row_hwy(
-  std::uint16_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint16_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 void process_erase_row_hwy(
-  std::uint8_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint8_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 void process_erase_row_hwy(
-  std::uint16_t* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<std::uint16_t> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 );
 

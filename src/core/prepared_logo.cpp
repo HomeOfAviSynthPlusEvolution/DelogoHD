@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include <optional>
+#include <span>
 
 namespace delogohd::core {
 
@@ -132,20 +133,32 @@ int LogoPlaneCoefficients::height() const noexcept {
   return height_;
 }
 
-int* LogoPlaneCoefficients::c_row(int y) noexcept {
-  return c_.data() + static_cast<std::size_t>(y) * width_;
+std::span<int> LogoPlaneCoefficients::c_row(int y) noexcept {
+  return {
+    c_.data() + static_cast<std::size_t>(y) * width_,
+    static_cast<std::size_t>(width_)
+  };
 }
 
-int* LogoPlaneCoefficients::d_row(int y) noexcept {
-  return d_.data() + static_cast<std::size_t>(y) * width_;
+std::span<int> LogoPlaneCoefficients::d_row(int y) noexcept {
+  return {
+    d_.data() + static_cast<std::size_t>(y) * width_,
+    static_cast<std::size_t>(width_)
+  };
 }
 
-const int* LogoPlaneCoefficients::c_row(int y) const noexcept {
-  return c_.data() + static_cast<std::size_t>(y) * width_;
+std::span<const int> LogoPlaneCoefficients::c_row(int y) const noexcept {
+  return {
+    c_.data() + static_cast<std::size_t>(y) * width_,
+    static_cast<std::size_t>(width_)
+  };
 }
 
-const int* LogoPlaneCoefficients::d_row(int y) const noexcept {
-  return d_.data() + static_cast<std::size_t>(y) * width_;
+std::span<const int> LogoPlaneCoefficients::d_row(int y) const noexcept {
+  return {
+    d_.data() + static_cast<std::size_t>(y) * width_,
+    static_cast<std::size_t>(width_)
+  };
 }
 
 PreparedLogo::PreparedLogo(const DelogoProcessorConfig& config)
@@ -192,8 +205,8 @@ int PreparedLogo::subsampling_h() const noexcept {
 void PreparedLogo::convert(LogoImage& image, bool mono) {
   planes_[0].reset(logo_header_.w, logo_header_.h);
   for (int y = 0; y < logo_header_.h; ++y) {
-    int* y_c = planes_[0].c_row(y);
-    int* y_d = planes_[0].d_row(y);
+    auto y_c = planes_[0].c_row(y);
+    auto y_d = planes_[0].d_row(y);
     for (int x = 0; x < logo_header_.w; ++x) {
       const auto index = static_cast<std::size_t>(y) * logo_header_.w + x;
       LOGO_PIXEL& pixel = image.pixels[index];
@@ -223,10 +236,10 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
 
   for (int y = 0; y < logo_header_.h; y += hstep) {
     const int dst_y = y / hstep;
-    int* u_c_row = planes_[1].c_row(dst_y);
-    int* u_d_row = planes_[1].d_row(dst_y);
-    int* v_c_row = planes_[2].c_row(dst_y);
-    int* v_d_row = planes_[2].d_row(dst_y);
+    auto u_c_row = planes_[1].c_row(dst_y);
+    auto u_d_row = planes_[1].d_row(dst_y);
+    auto v_c_row = planes_[2].c_row(dst_y);
+    auto v_d_row = planes_[2].d_row(dst_y);
 
     for (int x = 0; x < logo_header_.w; x += wstep) {
       const int dst_x = x / wstep;

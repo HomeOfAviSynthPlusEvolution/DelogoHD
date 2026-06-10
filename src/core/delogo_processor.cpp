@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <span>
 
 namespace delogohd::core {
 
@@ -16,41 +17,39 @@ constexpr double kOpaqueThreshold = 1.0 - 1e-2;
 
 template <class Pixel>
 void process_add_fade_row(
-  Pixel* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<Pixel> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth,
   double opacity,
   RowKernelBackend backend
 ) {
   const int pixel_max = (1 << bit_depth) - 1;
-  for (int j = 0; j < upbound; ++j) {
-    const int depth = scaled_depth(array_d[j], opacity);
+  for (std::size_t j = 0; j < row.size(); ++j) {
+    const int depth = scaled_depth(depths[j], opacity);
     const int data = backend == RowKernelBackend::Scalar
-      ? apply_add_alpha(cellptr[j], array_c[j], depth, bit_depth)
-      : apply_add_alpha_reciprocal(cellptr[j], array_c[j], depth, bit_depth);
-    cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
+      ? apply_add_alpha(row[j], colors[j], depth, bit_depth)
+      : apply_add_alpha_reciprocal(row[j], colors[j], depth, bit_depth);
+    row[j] = static_cast<Pixel>(std::min(data, pixel_max));
   }
 }
 
 template <class Pixel>
 void process_erase_fade_row(
-  Pixel* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<Pixel> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth,
   double opacity,
   RowKernelBackend backend
 ) {
   const int pixel_max = (1 << bit_depth) - 1;
-  for (int j = 0; j < upbound; ++j) {
-    const int depth = scaled_depth(array_d[j], opacity);
+  for (std::size_t j = 0; j < row.size(); ++j) {
+    const int depth = scaled_depth(depths[j], opacity);
     const int data = backend == RowKernelBackend::Scalar
-      ? apply_erase_alpha(cellptr[j], array_c[j], depth, bit_depth)
-      : apply_erase_alpha_reciprocal(cellptr[j], array_c[j], depth, bit_depth);
-    cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
+      ? apply_erase_alpha(row[j], colors[j], depth, bit_depth)
+      : apply_erase_alpha_reciprocal(row[j], colors[j], depth, bit_depth);
+    row[j] = static_cast<Pixel>(std::min(data, pixel_max));
   }
 }
 
@@ -58,26 +57,38 @@ template <class Pixel>
 void process_opaque_row(
   LogoOperation operation,
   RowKernelBackend backend,
-  Pixel* cellptr,
-  int upbound,
-  const int* array_c,
-  const int* array_d,
+  std::span<Pixel> row,
+  std::span<const int> colors,
+  std::span<const int> depths,
   int bit_depth
 ) {
   if (backend == RowKernelBackend::Scalar) {
     if (operation == LogoOperation::Add) {
-      process_add_row_c(cellptr, upbound, array_c, array_d, bit_depth);
+      process_add_row_c(row, colors, depths, bit_depth);
     } else {
-      process_erase_row_c(cellptr, upbound, array_c, array_d, bit_depth);
+      process_erase_row_c(row, colors, depths, bit_depth);
     }
     return;
   }
 
   if (operation == LogoOperation::Add) {
-    process_add_row_hwy(cellptr, upbound, array_c, array_d, bit_depth);
+    process_add_row_hwy(row, colors, depths, bit_depth);
   } else {
-    process_erase_row_hwy(cellptr, upbound, array_c, array_d, bit_depth);
+    process_erase_row_hwy(row, colors, depths, bit_depth);
   }
+}
+
+template <class Pixel>
+std::span<Pixel> pixel_row(
+  ds::PlaneView2D<Pixel> pixels,
+  int y,
+  int x,
+  int width
+) {
+  return {
+    &pixels[static_cast<std::size_t>(y), static_cast<std::size_t>(x)],
+    static_cast<std::size_t>(width)
+  };
 }
 
 } // namespace
@@ -137,29 +148,27 @@ void DelogoProcessor::process_plane(
   }
 
   auto pixels = ds::as_plane_view<Pixel>(plane);
+  const auto row_width = static_cast<std::size_t>(upbound);
 
   if (opacity <= kOpaqueThreshold) {
     for (int i = 0; i < row_count; ++i) {
-      Pixel* cellptr = &pixels[
-        static_cast<std::size_t>(logoy + i),
-        static_cast<std::size_t>(logox)
-      ];
+      auto row = pixel_row(pixels, logoy + i, logox, upbound);
+      auto colors = coefficients.c_row(i).first(row_width);
+      auto depths = coefficients.d_row(i).first(row_width);
       if (operation_ == LogoOperation::Add) {
         process_add_fade_row(
-          cellptr,
-          upbound,
-          coefficients.c_row(i),
-          coefficients.d_row(i),
+          row,
+          colors,
+          depths,
           bit_depth_,
           opacity,
           backend_
         );
       } else {
         process_erase_fade_row(
-          cellptr,
-          upbound,
-          coefficients.c_row(i),
-          coefficients.d_row(i),
+          row,
+          colors,
+          depths,
           bit_depth_,
           opacity,
           backend_
@@ -170,17 +179,13 @@ void DelogoProcessor::process_plane(
   }
 
   for (int i = 0; i < row_count; ++i) {
-    Pixel* cellptr = &pixels[
-      static_cast<std::size_t>(logoy + i),
-      static_cast<std::size_t>(logox)
-    ];
+    auto row = pixel_row(pixels, logoy + i, logox, upbound);
     process_opaque_row(
       operation_,
       backend_,
-      cellptr,
-      upbound,
-      coefficients.c_row(i),
-      coefficients.d_row(i),
+      row,
+      coefficients.c_row(i).first(row_width),
+      coefficients.d_row(i).first(row_width),
       bit_depth_
     );
   }

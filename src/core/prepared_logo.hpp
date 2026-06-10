@@ -4,6 +4,7 @@
 #include "core/logo_file.hpp"
 
 #include <cstddef>
+#include <span>
 
 namespace delogohd::core {
 
@@ -19,10 +20,10 @@ public:
   bool active() const noexcept;
   int width() const noexcept;
   int height() const noexcept;
-  int* c_row(int y) noexcept;
-  int* d_row(int y) noexcept;
-  const int* c_row(int y) const noexcept;
-  const int* d_row(int y) const noexcept;
+  std::span<int> c_row(int y) noexcept;
+  std::span<int> d_row(int y) noexcept;
+  std::span<const int> c_row(int y) const noexcept;
+  std::span<const int> d_row(int y) const noexcept;
 
 private:
   int width_ = 0;
