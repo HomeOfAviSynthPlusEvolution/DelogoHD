@@ -1,5 +1,6 @@
 #include "plugin/delogohd_filter.hpp"
 
+#include <climits>
 #include <cstdint>
 #include <exception>
 #include <optional>
@@ -28,14 +29,6 @@ bool has_param(const ds::ParamValues& params, const std::string& name) {
   return find_param(params, name) != nullptr;
 }
 
-template <class T>
-ds::Result<T> get_or_forward(ds::Result<T> result) {
-  if (!result.has_value()) {
-    return ds::Result<T>::failure(result.error());
-  }
-  return result;
-}
-
 ds::Result<std::optional<std::string>> optional_string(
   const ds::ParamValues& params,
   const std::string& name
@@ -48,6 +41,108 @@ ds::Result<std::optional<std::string>> optional_string(
     return ds::Result<std::optional<std::string>>::failure(value.error());
   }
   return ds::Result<std::optional<std::string>>::success(value.value());
+}
+
+template <class Parameters>
+struct ParsedInitParameters {
+  Parameters timeline;
+  std::string logofile;
+  std::optional<std::string> logoname;
+  bool mono = false;
+  int cutoff = 0;
+};
+
+template <class Parameters>
+ds::Result<ParsedInitParameters<Parameters>> parse_init_parameters(
+  const ds::ParamValues& params
+) {
+  auto logofile = optional_string(params, "logofile");
+  if (!logofile.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(logofile.error());
+  }
+  if (!logofile.value().has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(
+      invalid_argument("where's the logo file?")
+    );
+  }
+
+  auto logoname = optional_string(params, "logoname");
+  if (!logoname.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(logoname.error());
+  }
+
+  auto left = params.get_int("left", 0);
+  auto top = params.get_int("top", 0);
+  auto start = params.get_int("start", 0);
+  auto end = params.get_int("end", INT_MAX);
+  auto fadein = params.get_int("fadein", 0);
+  auto fadeout = params.get_int("fadeout", 0);
+  auto opt = params.get_int("opt", 0);
+  auto mono = params.get_bool("mono", false);
+  auto cutoff = params.get_int("cutoff", 0);
+
+  if (!left.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(left.error());
+  if (!top.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(top.error());
+  if (!start.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(start.error());
+  if (!end.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(end.error());
+  if (!fadein.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(fadein.error());
+  if (!fadeout.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(fadeout.error());
+  if (!opt.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(opt.error());
+  if (!mono.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(mono.error());
+  if (!cutoff.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(cutoff.error());
+
+  ParsedInitParameters<Parameters> parsed{};
+  parsed.timeline.left = left.value();
+  parsed.timeline.top = top.value();
+  parsed.timeline.start = start.value();
+  parsed.timeline.end = end.value();
+  parsed.timeline.fadein = fadein.value();
+  parsed.timeline.fadeout = fadeout.value();
+  parsed.timeline.opt = opt.value();
+  parsed.logofile = std::move(logofile.value().value());
+  parsed.logoname = std::move(logoname.value());
+  parsed.mono = mono.value();
+  parsed.cutoff = cutoff.value();
+  return ds::Result<ParsedInitParameters<Parameters>>::success(std::move(parsed));
+}
+
+template <core::LogoOperation Operation, class Parameters>
+core::DelogoProcessorConfig make_processor_config(
+  const ds::VideoInputInfo& input,
+  const ParsedInitParameters<Parameters>& parsed
+) {
+  core::DelogoProcessorConfig processor_config{};
+  processor_config.operation = Operation;
+  processor_config.backend = parsed.timeline.opt == 1
+    ? core::RowKernelBackend::Scalar
+    : core::RowKernelBackend::Highway;
+  processor_config.logofile = parsed.logofile.c_str();
+  processor_config.logoname = parsed.logoname.has_value()
+    ? parsed.logoname->c_str()
+    : nullptr;
+  processor_config.bit_depth = ds::bits_per_sample(input.format.sample_format);
+  processor_config.subsampling_w = input.format.subsampling_w;
+  processor_config.subsampling_h = input.format.subsampling_h;
+  processor_config.left = parsed.timeline.left;
+  processor_config.top = parsed.timeline.top;
+  processor_config.mono = parsed.mono;
+  processor_config.cutoff = parsed.cutoff;
+  return processor_config;
+}
+
+ds::Result<bool> set_logo_host_vars(
+  ds::VideoInitContext& context,
+  const LOGO_HEADER& source_header
+) {
+  auto set_result = context.set_host_var("delogohd_left", source_header.x);
+  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  set_result = context.set_host_var("delogohd_top", source_header.y);
+  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  set_result = context.set_host_var("delogohd_width", source_header.w);
+  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  set_result = context.set_host_var("delogohd_height", source_header.h);
+  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  return ds::Result<bool>::success(true);
 }
 
 template <class Parameters>
@@ -138,83 +233,25 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
     const ds::ParamValues empty_params{};
     const ds::ParamValues& params = context.params ? *context.params : empty_params;
 
-    auto logofile = optional_string(params, "logofile");
-    if (!logofile.has_value()) {
-      return ds::Result<ds::VideoInitStateResult<State>>::failure(logofile.error());
+    auto parsed_result = parse_init_parameters<Parameters>(params);
+    if (!parsed_result.has_value()) {
+      return ds::Result<ds::VideoInitStateResult<State>>::failure(parsed_result.error());
     }
-    if (!logofile.value().has_value()) {
-      return ds::Result<ds::VideoInitStateResult<State>>::failure(
-        invalid_argument("where's the logo file?")
-      );
-    }
-
-    auto logoname = optional_string(params, "logoname");
-    if (!logoname.has_value()) {
-      return ds::Result<ds::VideoInitStateResult<State>>::failure(logoname.error());
-    }
-
-    Parameters parsed{};
-    auto left = get_or_forward(params.get_int("left", 0));
-    auto top = get_or_forward(params.get_int("top", 0));
-    auto start = get_or_forward(params.get_int("start", 0));
-    auto end = get_or_forward(params.get_int("end", INT_MAX));
-    auto fadein = get_or_forward(params.get_int("fadein", 0));
-    auto fadeout = get_or_forward(params.get_int("fadeout", 0));
-    auto opt = get_or_forward(params.get_int("opt", 0));
-    auto mono = params.get_bool("mono", false);
-    auto cutoff = get_or_forward(params.get_int("cutoff", 0));
-    if (!left.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(left.error());
-    if (!top.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(top.error());
-    if (!start.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(start.error());
-    if (!end.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(end.error());
-    if (!fadein.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(fadein.error());
-    if (!fadeout.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(fadeout.error());
-    if (!opt.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(opt.error());
-    if (!mono.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(mono.error());
-    if (!cutoff.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(cutoff.error());
-
-    parsed.left = left.value();
-    parsed.top = top.value();
-    parsed.start = start.value();
-    parsed.end = end.value();
-    parsed.fadein = fadein.value();
-    parsed.fadeout = fadeout.value();
-    parsed.opt = opt.value();
+    auto parsed = std::move(parsed_result.value());
 
     const ds::VideoInputInfo& input = inputs.value()[0];
-    core::DelogoProcessorConfig processor_config{};
-    processor_config.operation = Operation;
-    processor_config.backend = parsed.opt == 1
-      ? core::RowKernelBackend::Scalar
-      : core::RowKernelBackend::Highway;
-    processor_config.logofile = logofile.value()->c_str();
-    processor_config.logoname = logoname.value().has_value()
-      ? logoname.value()->c_str()
-      : nullptr;
-    processor_config.bit_depth = ds::bits_per_sample(input.format.sample_format);
-    processor_config.subsampling_w = input.format.subsampling_w;
-    processor_config.subsampling_h = input.format.subsampling_h;
-    processor_config.left = parsed.left;
-    processor_config.top = parsed.top;
-    processor_config.mono = mono.value();
-    processor_config.cutoff = cutoff.value();
-
+    auto processor_config = make_processor_config<Operation>(input, parsed);
     auto processor = std::make_unique<core::DelogoProcessor>(processor_config);
-    const LOGO_HEADER& source_header = processor->source_header();
 
-    auto set_result = context.set_host_var("delogohd_left", source_header.x);
-    if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
-    set_result = context.set_host_var("delogohd_top", source_header.y);
-    if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
-    set_result = context.set_host_var("delogohd_width", source_header.w);
-    if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
-    set_result = context.set_host_var("delogohd_height", source_header.h);
-    if (!set_result.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(set_result.error());
+    auto host_vars = set_logo_host_vars(context, processor->source_header());
+    if (!host_vars.has_value()) {
+      return ds::Result<ds::VideoInitStateResult<State>>::failure(host_vars.error());
+    }
 
     return ds::Result<ds::VideoInitStateResult<State>>::success(
       ds::VideoInitStateResult<State>{
         ds::VideoOutputInfo{input.width, input.height, input.num_frames, input.format, input.fps},
-        State{std::move(processor), parsed}
+        State{std::move(processor), parsed.timeline}
       }
     );
   } catch (const std::exception& error) {
