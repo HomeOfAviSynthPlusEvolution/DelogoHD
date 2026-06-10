@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            runner: ubuntu-24.04
+            platform: linux
+            artifact: libDelogoHD.so
+          - name: linux-arm64
+            runner: ubuntu-24.04-arm
+            platform: linux
+            artifact: libDelogoHD.so
+          - name: windows-x64
+            runner: windows-2025-vs2026
+            platform: windows
+            generator: Visual Studio 18 2026
+            arch: x64
+            artifact: Release/DelogoHD.dll
+          - name: windows-arm64
+            runner: windows-11-arm
+            platform: windows
+            generator: Visual Studio 17 2022
+            arch: ARM64
+            artifact: Release/DelogoHD.dll
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Linux
+        if: matrix.platform == 'linux'
+        run: >
+          cmake -S . -B build/ci
+          -DCMAKE_BUILD_TYPE=Release
+          -DDELOGOHD_BUILD_TEST_TOOLS=OFF
+          -DDELOGOHD_COPY_RELEASE=OFF
+
+      - name: Configure Windows
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: >
+          cmake -S . -B build/ci
+          -G "${{ matrix.generator }}"
+          -A ${{ matrix.arch }}
+          -DDELOGOHD_BUILD_TEST_TOOLS=OFF
+          -DDELOGOHD_COPY_RELEASE=OFF
+
+      - name: Build
+        run: cmake --build build/ci --config Release --parallel 4
+
+      - name: Upload plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: DelogoHD-${{ matrix.name }}
+          path: build/ci/${{ matrix.artifact }}
+          if-no-files-found: error
