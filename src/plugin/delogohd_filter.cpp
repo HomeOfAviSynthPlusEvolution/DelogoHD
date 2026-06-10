@@ -98,7 +98,8 @@ ds::FilterDescriptor make_descriptor(std::string name) {
       ds::ParamSpec{"fadein", ds::ParamType::Integer},
       ds::ParamSpec{"fadeout", ds::ParamType::Integer},
       ds::ParamSpec{"mono", ds::ParamType::Boolean},
-      ds::ParamSpec{"cutoff", ds::ParamType::Integer}
+      ds::ParamSpec{"cutoff", ds::ParamType::Integer},
+      ds::ParamSpec{"opt", ds::ParamType::Integer}
     }
   };
 }
@@ -159,6 +160,7 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
     auto end = get_or_forward(params.get_int("end", INT_MAX));
     auto fadein = get_or_forward(params.get_int("fadein", 0));
     auto fadeout = get_or_forward(params.get_int("fadeout", 0));
+    auto opt = get_or_forward(params.get_int("opt", 0));
     auto mono = params.get_bool("mono", false);
     auto cutoff = get_or_forward(params.get_int("cutoff", 0));
     if (!left.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(left.error());
@@ -167,6 +169,7 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
     if (!end.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(end.error());
     if (!fadein.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(fadein.error());
     if (!fadeout.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(fadeout.error());
+    if (!opt.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(opt.error());
     if (!mono.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(mono.error());
     if (!cutoff.has_value()) return ds::Result<ds::VideoInitStateResult<State>>::failure(cutoff.error());
 
@@ -176,10 +179,14 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
     parsed.end = end.value();
     parsed.fadein = fadein.value();
     parsed.fadeout = fadeout.value();
+    parsed.opt = opt.value();
 
     const ds::VideoInputInfo& input = inputs.value()[0];
     core::DelogoProcessorConfig processor_config{};
     processor_config.operation = Operation;
+    processor_config.backend = parsed.opt == 1
+      ? core::RowKernelBackend::Scalar
+      : core::RowKernelBackend::Highway;
     processor_config.logofile = logofile.value()->c_str();
     processor_config.logoname = logoname.value().has_value()
       ? logoname.value()->c_str()

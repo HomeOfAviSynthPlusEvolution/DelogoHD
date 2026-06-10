@@ -33,7 +33,6 @@ void process_erase_row_c(
   int bit_depth
 );
 
-#if !defined(PURE_C)
 void process_add_row_hwy(
   std::uint8_t* cellptr,
   int upbound,
@@ -62,6 +61,5 @@ void process_erase_row_hwy(
   const int* array_d,
   int bit_depth
 );
-#endif
 
 } // namespace delogohd::core

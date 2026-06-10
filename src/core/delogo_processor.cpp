@@ -1,5 +1,6 @@
 #include "core/delogo_processor.hpp"
 
+#include "core/canonical_math.hpp"
 #include "core/row_kernel.hpp"
 
 #include <algorithm>
@@ -60,9 +61,19 @@ void process_add_fade_row(
   const int* array_d,
   int bit_depth,
   int plane,
-  double opacity
+  double opacity,
+  RowKernelBackend backend
 ) {
   const int pixel_max = (1 << bit_depth) - 1;
+  if (backend == RowKernelBackend::Scalar) {
+    for (int j = 0; j < upbound; ++j) {
+      const int depth = scaled_depth(array_d[j], opacity);
+      const int data = apply_add_alpha(cellptr[j], array_c[j], depth, bit_depth);
+      cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
+    }
+    return;
+  }
+
   const int shift = 18 - bit_depth;
   for (int j = 0; j < upbound; ++j) {
     int data = cellptr[j];
@@ -94,9 +105,19 @@ void process_erase_fade_row(
   const int* array_d,
   int bit_depth,
   int plane,
-  double opacity
+  double opacity,
+  RowKernelBackend backend
 ) {
   const int pixel_max = (1 << bit_depth) - 1;
+  if (backend == RowKernelBackend::Scalar) {
+    for (int j = 0; j < upbound; ++j) {
+      const int depth = scaled_depth(array_d[j], opacity);
+      const int data = apply_erase_alpha(cellptr[j], array_c[j], depth, bit_depth);
+      cellptr[j] = static_cast<Pixel>(std::min(data, pixel_max));
+    }
+    return;
+  }
+
   const int shift = 20 - bit_depth;
   for (int j = 0; j < upbound; ++j) {
     int data = cellptr[j];
@@ -123,31 +144,34 @@ void process_erase_fade_row(
 template <class Pixel>
 void process_opaque_row(
   LogoOperation operation,
+  RowKernelBackend backend,
   Pixel* cellptr,
   int upbound,
   const int* array_c,
   const int* array_d,
   int bit_depth
 ) {
-#if defined(PURE_C)
-  if (operation == LogoOperation::Add) {
-    process_add_row_c(cellptr, upbound, array_c, array_d, bit_depth);
-  } else {
-    process_erase_row_c(cellptr, upbound, array_c, array_d, bit_depth);
+  if (backend == RowKernelBackend::Scalar) {
+    if (operation == LogoOperation::Add) {
+      process_add_row_c(cellptr, upbound, array_c, array_d, bit_depth);
+    } else {
+      process_erase_row_c(cellptr, upbound, array_c, array_d, bit_depth);
+    }
+    return;
   }
-#else
+
   if (operation == LogoOperation::Add) {
     process_add_row_hwy(cellptr, upbound, array_c, array_d, bit_depth);
   } else {
     process_erase_row_hwy(cellptr, upbound, array_c, array_d, bit_depth);
   }
-#endif
 }
 
 } // namespace
 
 DelogoProcessor::DelogoProcessor(const DelogoProcessorConfig& config)
   : operation_(config.operation),
+    backend_(config.backend),
     bit_depth_(config.bit_depth),
     logo_(config) {}
 
@@ -208,7 +232,8 @@ void DelogoProcessor::process_plane(
           coefficients.d_row(i),
           bit_depth_,
           plane_index,
-          opacity
+          opacity,
+          backend_
         );
       } else {
         process_erase_fade_row(
@@ -218,7 +243,8 @@ void DelogoProcessor::process_plane(
           coefficients.d_row(i),
           bit_depth_,
           plane_index,
-          opacity
+          opacity,
+          backend_
         );
       }
       rowptr += plane.stride_bytes;
@@ -230,6 +256,7 @@ void DelogoProcessor::process_plane(
     auto* cellptr = reinterpret_cast<Pixel*>(rowptr) + logox;
     process_opaque_row(
       operation_,
+      backend_,
       cellptr,
       upbound,
       coefficients.c_row(i),

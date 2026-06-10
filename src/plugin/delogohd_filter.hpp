@@ -28,6 +28,7 @@ struct LogoCore {
     int fadeout = 0;
     int left = 0;
     int top = 0;
+    int opt = 0;
   };
 
   struct State {

@@ -4,25 +4,22 @@ project(DelogoHD CXX)
 
 option(DELOGOHD_BUILD_TEST_TOOLS "Build DelogoHD baseline test tools" ON)
 option(DELOGOHD_COPY_RELEASE "Copy the built plugin to the legacy Release_<version> directory" OFF)
-option(DELOGOHD_PURE_C "Build DelogoHD with scalar C row kernels instead of SSE4.1 row kernels" OFF)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-if(NOT DELOGOHD_PURE_C)
-  FetchContent_Declare(
-    highway
-    GIT_REPOSITORY https://github.com/google/highway.git
-    GIT_TAG 1.3.0
-  )
-  set(HWY_ENABLE_CONTRIB OFF CACHE BOOL "" FORCE)
-  set(HWY_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
-  set(HWY_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
-  set(HWY_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
-  FetchContent_MakeAvailable(highway)
-endif()
+FetchContent_Declare(
+  highway
+  GIT_REPOSITORY https://github.com/google/highway.git
+  GIT_TAG 1.3.0
+)
+set(HWY_ENABLE_CONTRIB OFF CACHE BOOL "" FORCE)
+set(HWY_ENABLE_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(HWY_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(HWY_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(highway)
 
 set(DS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(DS_BUILD_ACCEPTANCE_PLUGIN OFF CACHE BOOL "" FORCE)
@@ -84,6 +81,7 @@ set(DELOGOHD_SOURCES
   src/plugin/delogohd_filter.cpp
   src/plugin/delogohd_filter.hpp
   src/core/aligned_buffer.hpp
+  src/core/canonical_math.hpp
   src/core/delogo_processor.cpp
   src/core/delogo_processor.hpp
   src/core/logo.h
@@ -92,13 +90,9 @@ set(DELOGOHD_SOURCES
   src/core/prepared_logo.cpp
   src/core/prepared_logo.hpp
   src/core/row_kernel_c.cpp
+  src/core/row_kernel_hwy.cpp
   src/core/row_kernel.hpp
 )
-if(NOT DELOGOHD_PURE_C)
-  list(APPEND DELOGOHD_SOURCES
-    src/core/row_kernel_hwy.cpp
-  )
-endif()
 if(WIN32)
   list(APPEND DELOGOHD_SOURCES "${DELOGOHD_GENERATED_DIR}/version.rc")
 endif()
@@ -110,10 +104,6 @@ target_compile_definitions(DelogoHD
   PRIVATE
     _CRT_NONSTDC_NO_DEPRECATE
 )
-if(DELOGOHD_PURE_C)
-  target_compile_definitions(DelogoHD PRIVATE PURE_C)
-endif()
-
 target_include_directories(DelogoHD
   PRIVATE
     ${DELOGOHD_AVISYNTH_INCLUDE_DIRS}
@@ -122,9 +112,7 @@ target_include_directories(DelogoHD
     "${DELOGOHD_GENERATED_DIR}"
 )
 
-if(NOT DELOGOHD_PURE_C)
-  target_link_libraries(DelogoHD PRIVATE hwy)
-endif()
+target_link_libraries(DelogoHD PRIVATE hwy)
 
 if(NOT WIN32)
   target_link_libraries(DelogoHD PRIVATE dl)

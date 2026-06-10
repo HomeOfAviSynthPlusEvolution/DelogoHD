@@ -11,8 +11,14 @@ enum class LogoOperation {
   Erase,
 };
 
+enum class RowKernelBackend {
+  Highway,
+  Scalar,
+};
+
 struct DelogoProcessorConfig {
   LogoOperation operation = LogoOperation::Erase;
+  RowKernelBackend backend = RowKernelBackend::Highway;
   const char* logofile = nullptr;
   const char* logoname = nullptr;
   int bit_depth = 8;
@@ -37,6 +43,7 @@ private:
   void process_plane(ds::MutablePlaneView& plane, int plane_index, double opacity);
 
   LogoOperation operation_;
+  RowKernelBackend backend_;
   int bit_depth_;
   PreparedLogo logo_;
 };

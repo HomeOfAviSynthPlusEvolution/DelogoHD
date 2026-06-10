@@ -29,7 +29,7 @@ const char* avs_signature() {
   static const std::string signature = [] {
     const auto generated = ds::make_avisynth_signature(Bridge::descriptor());
     if (!generated.has_value()) {
-      return std::string{"c[logofile]s[logoname]s[left]i[top]i[start]i[end]i[fadein]i[fadeout]i[mono]b[cutoff]i"};
+      return std::string{"c[logofile]s[logoname]s[left]i[top]i[start]i[end]i[fadein]i[fadeout]i[mono]b[cutoff]i[opt]i"};
     }
     return generated.value();
   }();
@@ -48,7 +48,8 @@ const char* vs_signature() {
     "fadein:int:opt;"
     "fadeout:int:opt;"
     "mono:int:opt;"
-    "cutoff:int:opt;";
+    "cutoff:int:opt;"
+    "opt:int:opt;";
 }
 
 template <class Bridge>
