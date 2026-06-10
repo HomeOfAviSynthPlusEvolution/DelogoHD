@@ -1,0 +1,3669 @@
+{
+  "results": [
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 0,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "c481d279bf5de4d27f9dbde9f4162ef22f65bd48496aca2794b6d62e943f303d",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 2,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "b18b3c3c794ffa55687ec8dd5e43e0df1235ab7456223e0d96ab7b7970ceacb3",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 3,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "0d896a7ef2b35f7fa5f62127d894fbd8629b1351d940e36be4fe13a4460be0a9",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 5,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "7ccc66daa34e892905351e006aa99d4c8df866b9f3361e8f8e661b4caa2e60b1",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 7,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "998138f9946a242cbd1e7413ec86ba44e4c843b5de9cd93f90eb62c13a5635c2",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 8,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "0732439f6d047ede5d2c44cff990b50e0f7f102c0378b12204f95a50cba60d26",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 9,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "eff7f3b7828c23dc44cd9e0f515786c8ba1443513e67652a0fed356667b8de85",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 0,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "c481d279bf5de4d27f9dbde9f4162ef22f65bd48496aca2794b6d62e943f303d",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 2,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "b18b3c3c794ffa55687ec8dd5e43e0df1235ab7456223e0d96ab7b7970ceacb3",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 3,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "0d896a7ef2b35f7fa5f62127d894fbd8629b1351d940e36be4fe13a4460be0a9",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 5,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "7ccc66daa34e892905351e006aa99d4c8df866b9f3361e8f8e661b4caa2e60b1",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 7,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "998138f9946a242cbd1e7413ec86ba44e4c843b5de9cd93f90eb62c13a5635c2",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 8,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "0732439f6d047ede5d2c44cff990b50e0f7f102c0378b12204f95a50cba60d26",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_fade",
+      "frame": 9,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "eff7f3b7828c23dc44cd9e0f515786c8ba1443513e67652a0fed356667b8de85",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 0,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "c481d279bf5de4d27f9dbde9f4162ef22f65bd48496aca2794b6d62e943f303d",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 2,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "83eb415ec43f4d8570517ecaee3d25247d660810a45210ea9dcd6fd9273ff229",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 3,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "e87ff7a5c8d4fdae8c39591745628affda7791e0b8c1d95674a53f5bd68a5b5b",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 5,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "028d056428834f6555b1f78c5c83b12087b9b290060a407bf03001bf952e9601",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 7,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "9ea88672db19dbdd6c52e115e3cd7f0ec07eba407f6e839257a68c8200e4a244",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 8,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "036e5cd55ebeb433810cf9f5c1e82bae620763b473b74d4b1ab209e642a86a1b",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 9,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "eff7f3b7828c23dc44cd9e0f515786c8ba1443513e67652a0fed356667b8de85",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 0,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "c481d279bf5de4d27f9dbde9f4162ef22f65bd48496aca2794b6d62e943f303d",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 2,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "83eb415ec43f4d8570517ecaee3d25247d660810a45210ea9dcd6fd9273ff229",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 3,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "e87ff7a5c8d4fdae8c39591745628affda7791e0b8c1d95674a53f5bd68a5b5b",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 5,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "028d056428834f6555b1f78c5c83b12087b9b290060a407bf03001bf952e9601",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 7,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "9ea88672db19dbdd6c52e115e3cd7f0ec07eba407f6e839257a68c8200e4a244",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 8,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "036e5cd55ebeb433810cf9f5c1e82bae620763b473b74d4b1ab209e642a86a1b",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_addlogo_fade",
+      "frame": 9,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 2
+      },
+      "sha256": "eff7f3b7828c23dc44cd9e0f515786c8ba1443513e67652a0fed356667b8de85",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 0,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "30c425aaa5fb27ea1ef5e207e233ffe8dc7f49aacfff7a1ef97ab595cfb46c19",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 2,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "2cb31e9ddbfef2c01debd5dd3e0973c4e4d3d4c844afae5dc02a696b9fa4e845",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 3,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "be993b266f0d473faca4cf2c5599e056ac1117ddb941e4a35baea7acfce92ee7",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 5,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "6e05ddda6940c21fbcd12b2c678d46c2ad46c50348de007d724a8fd6b640f956",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 7,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "33d8bac5717f615408e39fb939ba366540fb5bfae222ec9cd6d9e009961b8173",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 8,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "2d53ec3d4d97fe8b5d6ec1508d134f328f15ae01505db02e859db5fb448981fe",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 9,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 180,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "244bdf03362ae615fc2544dbddd33d8daa87dec514270ce7e9727fb6f3148056",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 0,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "30c425aaa5fb27ea1ef5e207e233ffe8dc7f49aacfff7a1ef97ab595cfb46c19",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 2,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "2cb31e9ddbfef2c01debd5dd3e0973c4e4d3d4c844afae5dc02a696b9fa4e845",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 3,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "be993b266f0d473faca4cf2c5599e056ac1117ddb941e4a35baea7acfce92ee7",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 5,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "6e05ddda6940c21fbcd12b2c678d46c2ad46c50348de007d724a8fd6b640f956",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 7,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "33d8bac5717f615408e39fb939ba366540fb5bfae222ec9cd6d9e009961b8173",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 8,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "2d53ec3d4d97fe8b5d6ec1508d134f328f15ae01505db02e859db5fb448981fe",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "blank_sequence_yuv420p8_delogo_mono_cutoff_offset",
+      "frame": 9,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 180,
+        "pixel_type": -1610612728,
+        "planes": [
+          {
+            "height": 180,
+            "name": "Y",
+            "row_bytes": 640
+          },
+          {
+            "height": 90,
+            "name": "U",
+            "row_bytes": 320
+          },
+          {
+            "height": 90,
+            "name": "V",
+            "row_bytes": 320
+          }
+        ],
+        "width": 640
+      },
+      "params": {
+        "cutoff": 5,
+        "end": 8,
+        "fadein": 3,
+        "fadeout": 3,
+        "left": -5,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "mono": true,
+        "start": 2,
+        "top": 3
+      },
+      "sha256": "244bdf03362ae615fc2544dbddd33d8daa87dec514270ce7e9727fb6f3148056",
+      "source": "blank_sequence_yuv420p8_640x180_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 0,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "586bcb726c02ac25f16ed529a99dc4c8872676449cdfcb62440cac02fab92fa0",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 1,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "b8d7b3635e4efc53d779b2b32f3db6f313e6e01a49b4c45e3b6638b8c5c892fc",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 2,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "2eeb8849a11c6c7671a9304ab0ae76117ff8558f30e82113ec6e377516f9b764",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 3,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "eb71f868065a34ca9e48dfadbac9896e99df8a33f9805f3d9308c92d8f633aab",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 4,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "e16df020ca2a8327b0542360051ea395a8c87cbacceb578e16a9e56fc99beeb5",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 5,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "a0403e206255d5e103fece788ab0d27d7ee1570c51b2b8f5f15dca3a55a9a09b",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 6,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "0b53ed969a51ce575761e7ae15e52eda18613b8932d45ee66ee2f8c4a829c215",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 7,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "06ae60ed3f41e8865b31f6eb80c8193422d5a1dab4ff951025c27d7b01489a43",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 8,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "fcd6cf5239fab1a107c2fc2895cc1ee319ff7b28cff7c6bc4e467930c9bf9d19",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 9,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "042d0616f51de50cd2ee600f8739335d7156ed8892e44396bd4b79366ccdab5c",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 0,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "586bcb726c02ac25f16ed529a99dc4c8872676449cdfcb62440cac02fab92fa0",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 1,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "b8d7b3635e4efc53d779b2b32f3db6f313e6e01a49b4c45e3b6638b8c5c892fc",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 2,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "2eeb8849a11c6c7671a9304ab0ae76117ff8558f30e82113ec6e377516f9b764",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 3,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "eb71f868065a34ca9e48dfadbac9896e99df8a33f9805f3d9308c92d8f633aab",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 4,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "e16df020ca2a8327b0542360051ea395a8c87cbacceb578e16a9e56fc99beeb5",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 5,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "a0403e206255d5e103fece788ab0d27d7ee1570c51b2b8f5f15dca3a55a9a09b",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 6,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "0b53ed969a51ce575761e7ae15e52eda18613b8932d45ee66ee2f8c4a829c215",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 7,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "06ae60ed3f41e8865b31f6eb80c8193422d5a1dab4ff951025c27d7b01489a43",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 8,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "fcd6cf5239fab1a107c2fc2895cc1ee319ff7b28cff7c6bc4e467930c9bf9d19",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_delogo_10frames",
+      "frame": 9,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "042d0616f51de50cd2ee600f8739335d7156ed8892e44396bd4b79366ccdab5c",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 0,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "f00e5e4a0d4ca708e34299415fb65ee27f953d4a8a5d375f68042fd4fd45a710",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 1,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "3723157a8666cca6e531e61735ab8bc17fac5e9615c59e5dbab359dadcf621f5",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 2,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "b9a0a7ca53a30cb7db2795b66e931e56c168b4b9e78e72aa2a9edca68a2cb5d7",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 3,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "30766e1505b550175482e54532906d30f94148cf431aef4436e5c296c9db1696",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 4,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "44259293ffbe389350b13d06677c6b0034de4b880e0c516ef42b24bd71d88b4a",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 5,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "7c94b71a8f9ddba175b5afe338cb897744cbfa3fda12e36c80c44c7bdd7a1cc6",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 6,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "8348a5e55a4e3b7d82b29453ffd0c439f1d1ec7e117fcf246a182c705a636258",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 7,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "cb00743864c583c7dda773b7e14068dfd6a7f7d160feb9e708c3db5802148e77",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 8,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "6d556dd0501a1afc21ff2b6cf9bc57d200b353cafffd3d56b2ab984d2e8fd328",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 9,
+      "host": "vs",
+      "metadata": {
+        "format": {
+          "bits_per_sample": 8,
+          "bytes_per_sample": 1,
+          "color_family": 3,
+          "id": 805830913,
+          "name": "YUV420P8",
+          "num_planes": 3,
+          "sample_type": 0,
+          "subsampling_h": 1,
+          "subsampling_w": 1
+        },
+        "frames": 10,
+        "height": 720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "e1202be928aab85170ddfcc8a7f3b58d300a12b49bd61476d503bf84c434288b",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 0,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "f00e5e4a0d4ca708e34299415fb65ee27f953d4a8a5d375f68042fd4fd45a710",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 1,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "3723157a8666cca6e531e61735ab8bc17fac5e9615c59e5dbab359dadcf621f5",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 2,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "b9a0a7ca53a30cb7db2795b66e931e56c168b4b9e78e72aa2a9edca68a2cb5d7",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 3,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "30766e1505b550175482e54532906d30f94148cf431aef4436e5c296c9db1696",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 4,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "44259293ffbe389350b13d06677c6b0034de4b880e0c516ef42b24bd71d88b4a",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 5,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "7c94b71a8f9ddba175b5afe338cb897744cbfa3fda12e36c80c44c7bdd7a1cc6",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 6,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "8348a5e55a4e3b7d82b29453ffd0c439f1d1ec7e117fcf246a182c705a636258",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 7,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "cb00743864c583c7dda773b7e14068dfd6a7f7d160feb9e708c3db5802148e77",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 8,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "6d556dd0501a1afc21ff2b6cf9bc57d200b353cafffd3d56b2ab984d2e8fd328",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    },
+    {
+      "case": "mp4_yuv420p8_addlogo_10frames",
+      "frame": 9,
+      "host": "avs",
+      "metadata": {
+        "bits_per_sample": 8,
+        "bytes_per_sample": 1,
+        "frames": 10,
+        "height": 720,
+        "pixel_type": -1610612720,
+        "planes": [
+          {
+            "height": 720,
+            "name": "Y",
+            "row_bytes": 1280
+          },
+          {
+            "height": 360,
+            "name": "U",
+            "row_bytes": 640
+          },
+          {
+            "height": 360,
+            "name": "V",
+            "row_bytes": 640
+          }
+        ],
+        "width": 1280
+      },
+      "params": {
+        "end": 9,
+        "fadein": 2,
+        "fadeout": 2,
+        "logofile": "assets/logos/test-640x180.lgd",
+        "start": 0
+      },
+      "sha256": "e1202be928aab85170ddfcc8a7f3b58d300a12b49bd61476d503bf84c434288b",
+      "source": "mp4_yuv420p8_1280x720_10f",
+      "tier": "smoke"
+    }
+  ],
+  "schema": 2
+}

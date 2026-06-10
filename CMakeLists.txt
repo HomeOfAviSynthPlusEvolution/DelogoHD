@@ -4,6 +4,7 @@ project(DelogoHD CXX)
 
 option(DELOGOHD_BUILD_TEST_TOOLS "Build DelogoHD baseline test tools" ON)
 option(DELOGOHD_COPY_RELEASE "Copy the built plugin to the legacy Release_<version> directory" OFF)
+option(DELOGOHD_PURE_C "Build DelogoHD with scalar C row kernels instead of SSE4.1 row kernels" OFF)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -70,13 +71,17 @@ set(DELOGOHD_SOURCES
   src/plugin/delogohd_filter.cpp
   src/plugin/delogohd_filter.hpp
   src/core/delogo_engine.add.cpp
-  src/core/delogo_engine.add_sse4.cpp
   src/core/delogo_engine.erase.cpp
-  src/core/delogo_engine.erase_sse4.cpp
   src/core/delogo_engine.preprocess.cpp
   src/core/delogo_engine.hpp
   src/core/logo.h
 )
+if(NOT DELOGOHD_PURE_C)
+  list(APPEND DELOGOHD_SOURCES
+    src/core/delogo_engine.add_sse4.cpp
+    src/core/delogo_engine.erase_sse4.cpp
+  )
+endif()
 if(WIN32)
   list(APPEND DELOGOHD_SOURCES "${DELOGOHD_GENERATED_DIR}/version.rc")
 endif()
@@ -88,6 +93,9 @@ target_compile_definitions(DelogoHD
   PRIVATE
     _CRT_NONSTDC_NO_DEPRECATE
 )
+if(DELOGOHD_PURE_C)
+  target_compile_definitions(DelogoHD PRIVATE PURE_C)
+endif()
 
 target_include_directories(DelogoHD
   PRIVATE
@@ -97,13 +105,15 @@ target_include_directories(DelogoHD
     "${DELOGOHD_GENERATED_DIR}"
 )
 
-target_compile_options(DelogoHD
-  PRIVATE
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-msse4.1>
-    $<$<CXX_COMPILER_ID:Intel>:/arch:SSE4.1>
-)
-if(MSVC)
-  target_compile_options(DelogoHD PRIVATE /arch:SSE2)
+if(NOT DELOGOHD_PURE_C)
+  target_compile_options(DelogoHD
+    PRIVATE
+      $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-msse4.1>
+      $<$<CXX_COMPILER_ID:Intel>:/arch:SSE4.1>
+  )
+  if(MSVC)
+    target_compile_options(DelogoHD PRIVATE /arch:SSE2)
+  endif()
 endif()
 
 if(NOT WIN32)

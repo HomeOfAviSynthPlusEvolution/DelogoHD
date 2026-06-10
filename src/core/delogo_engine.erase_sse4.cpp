@@ -1,5 +1,11 @@
 #include "delogo_engine.hpp"
 
+#if _MSC_VER
+  #include <intrin.h>
+#else
+  #include <x86intrin.h>
+#endif
+
 __m128i _simd_compute_erase(const __m128i &data_p, const int shift, const __m128i &zero, const __m128i &one, const __m128i &max_dp_shifted, const __m128i &data_c, const __m128i &data_d) {
   // data = (data * LOGO_MAX_DP + c) * (1<<30 / d');
 

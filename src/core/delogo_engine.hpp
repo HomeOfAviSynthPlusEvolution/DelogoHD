@@ -9,12 +9,6 @@
 #include <cstdlib>
 #include <assert.h>
 
-#if _MSC_VER
-  #include <intrin.h>
-#else
-  #include <x86intrin.h>
-#endif
-
 #if !_WIN32
   #define __stdcall
   // Use standard C11 aligned malloc
