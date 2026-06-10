@@ -88,12 +88,8 @@ std::span<Pixel> pixel_row(
 ) {
   const auto first = static_cast<std::size_t>(x);
   const auto last = first + static_cast<std::size_t>(width);
-  auto row = std::submdspan(
-    pixels,
-    static_cast<std::size_t>(y),
-    std::pair{first, last}
-  );
-  return {row.data_handle(), row.extent(0)};
+  const auto offset = pixels.mapping()(static_cast<std::size_t>(y), first);
+  return {pixels.data_handle() + offset, last - first};
 }
 
 } // namespace

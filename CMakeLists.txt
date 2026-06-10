@@ -4,6 +4,8 @@ project(DelogoHD CXX)
 
 option(DELOGOHD_BUILD_TEST_TOOLS "Build DelogoHD baseline test tools" ON)
 option(DELOGOHD_COPY_RELEASE "Copy the built plugin to the legacy Release_<version> directory" OFF)
+set(DELOGOHD_AVISYNTHPLUS_TAG "v3.7.5" CACHE STRING "AviSynthPlus tag used when pkg-config cannot find AviSynth headers")
+set(DELOGOHD_VAPOURSYNTH_TAG "R72" CACHE STRING "VapourSynth tag used when pkg-config cannot find VapourSynth headers")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -30,26 +32,81 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(dualsynth2)
 
-if(NOT MSVC)
-  find_package(PkgConfig REQUIRED)
+function(delogohd_fetch_avisynth_headers out_var)
+  FetchContent_Declare(
+    avisynthplus_headers
+    GIT_REPOSITORY https://github.com/AviSynth/AviSynthPlus.git
+    GIT_TAG "${DELOGOHD_AVISYNTHPLUS_TAG}"
+    GIT_SHALLOW TRUE
+    SOURCE_SUBDIR delogohd-no-cmake
+  )
+  FetchContent_MakeAvailable(avisynthplus_headers)
+  FetchContent_GetProperties(avisynthplus_headers)
+  set(${out_var} "${avisynthplus_headers_SOURCE_DIR}/avs_core/include" PARENT_SCOPE)
+endfunction()
 
-  pkg_check_modules(AVISYNTH avisynth)
-  if(AVISYNTH_FOUND)
-    set(DELOGOHD_AVISYNTH_INCLUDE_DIRS ${AVISYNTH_INCLUDE_DIRS})
-  else()
-    set(DELOGOHD_AVISYNTH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include/avisynth")
-  endif()
+function(delogohd_fetch_vapoursynth_headers out_var)
+  FetchContent_Declare(
+    vapoursynth_headers
+    GIT_REPOSITORY https://github.com/vapoursynth/vapoursynth.git
+    GIT_TAG "${DELOGOHD_VAPOURSYNTH_TAG}"
+    GIT_SHALLOW TRUE
+    SOURCE_SUBDIR delogohd-no-cmake
+  )
+  FetchContent_MakeAvailable(vapoursynth_headers)
+  FetchContent_GetProperties(vapoursynth_headers)
+  set(${out_var} "${vapoursynth_headers_SOURCE_DIR}/include" PARENT_SCOPE)
+endfunction()
 
-  pkg_check_modules(VAPOURSYNTH vapoursynth)
-  if(VAPOURSYNTH_FOUND)
-    set(DELOGOHD_VAPOURSYNTH_INCLUDE_DIRS ${VAPOURSYNTH_INCLUDE_DIRS})
-  else()
-    set(DELOGOHD_VAPOURSYNTH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include/vapoursynth")
-  endif()
-else()
-  set(DELOGOHD_AVISYNTH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include/avisynth")
-  set(DELOGOHD_VAPOURSYNTH_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include/vapoursynth")
+function(delogohd_add_vapoursynth_compat_headers target)
+  set(compat_dir "${CMAKE_CURRENT_BINARY_DIR}/generated/vapoursynth-compat")
+  file(MAKE_DIRECTORY "${compat_dir}/vapoursynth")
+  foreach(header IN ITEMS
+    VSConstants4.h
+    VSHelper.h
+    VSHelper4.h
+    VSScript.h
+    VSScript4.h
+    VapourSynth.h
+    VapourSynth4.h
+  )
+    file(WRITE
+      "${compat_dir}/vapoursynth/${header}"
+      "#pragma once\n#include <${header}>\n"
+    )
+  endforeach()
+  target_include_directories(${target} INTERFACE "${compat_dir}")
+endfunction()
+
+find_package(PkgConfig QUIET)
+
+if(PkgConfig_FOUND)
+  pkg_check_modules(AVISYNTH QUIET avisynth)
+  pkg_check_modules(VAPOURSYNTH QUIET vapoursynth)
 endif()
+
+add_library(delogohd_avisynth_headers INTERFACE)
+if(AVISYNTH_FOUND)
+  target_include_directories(delogohd_avisynth_headers INTERFACE ${AVISYNTH_INCLUDE_DIRS})
+  target_compile_options(delogohd_avisynth_headers INTERFACE ${AVISYNTH_CFLAGS_OTHER})
+  message(STATUS "Using AviSynth headers from pkg-config")
+else()
+  delogohd_fetch_avisynth_headers(DELOGOHD_AVISYNTH_INCLUDE_DIRS)
+  target_include_directories(delogohd_avisynth_headers INTERFACE ${DELOGOHD_AVISYNTH_INCLUDE_DIRS})
+  message(STATUS "Using AviSynth headers from FetchContent (${DELOGOHD_AVISYNTHPLUS_TAG})")
+endif()
+
+add_library(delogohd_vapoursynth_headers INTERFACE)
+if(VAPOURSYNTH_FOUND)
+  target_include_directories(delogohd_vapoursynth_headers INTERFACE ${VAPOURSYNTH_INCLUDE_DIRS})
+  target_compile_options(delogohd_vapoursynth_headers INTERFACE ${VAPOURSYNTH_CFLAGS_OTHER})
+  message(STATUS "Using VapourSynth headers from pkg-config")
+else()
+  delogohd_fetch_vapoursynth_headers(DELOGOHD_VAPOURSYNTH_INCLUDE_DIRS)
+  target_include_directories(delogohd_vapoursynth_headers INTERFACE ${DELOGOHD_VAPOURSYNTH_INCLUDE_DIRS})
+  message(STATUS "Using VapourSynth headers from FetchContent (${DELOGOHD_VAPOURSYNTH_TAG})")
+endif()
+delogohd_add_vapoursynth_compat_headers(delogohd_vapoursynth_headers)
 
 find_package(Git)
 if(GIT_FOUND)
@@ -107,13 +164,11 @@ target_compile_definitions(DelogoHD
 )
 target_include_directories(DelogoHD
   PRIVATE
-    ${DELOGOHD_AVISYNTH_INCLUDE_DIRS}
-    ${DELOGOHD_VAPOURSYNTH_INCLUDE_DIRS}
     "${PROJECT_SOURCE_DIR}/src"
     "${DELOGOHD_GENERATED_DIR}"
 )
 
-target_link_libraries(DelogoHD PRIVATE hwy)
+target_link_libraries(DelogoHD PRIVATE hwy delogohd_avisynth_headers delogohd_vapoursynth_headers)
 
 if(NOT WIN32)
   target_link_libraries(DelogoHD PRIVATE dl)
@@ -136,7 +191,7 @@ if(DELOGOHD_BUILD_TEST_TOOLS)
     tests/tools/avs_frame_dump.cpp
   )
   set_property(TARGET delogohd_avs_frame_dump PROPERTY CXX_STANDARD 17)
-  target_include_directories(delogohd_avs_frame_dump PRIVATE ${DELOGOHD_AVISYNTH_INCLUDE_DIRS})
+  target_link_libraries(delogohd_avs_frame_dump PRIVATE delogohd_avisynth_headers)
   if(NOT WIN32)
     target_link_libraries(delogohd_avs_frame_dump PRIVATE dl)
   endif()

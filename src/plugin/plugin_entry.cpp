@@ -1,5 +1,5 @@
 #include <avisynth.h>
-#include <vapoursynth/VapourSynth4.h>
+#include <VapourSynth4.h>
 
 #include <dualsynth/avisynth/video_bridge.hpp>
 #include <dualsynth/vapoursynth/video_bridge.hpp>
