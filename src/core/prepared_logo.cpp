@@ -108,7 +108,7 @@ std::optional<LogoImage> shift_logo(LogoImage image, int left, int top) {
     const auto dst_offset = dst_h + static_cast<std::size_t>(y + dst_v) * neww;
     auto src_row = src_pixels.subspan(src_offset, static_cast<std::size_t>(len_h));
     auto dst_row = dst_pixels.subspan(dst_offset, static_cast<std::size_t>(len_h));
-    std::copy(src_row.begin(), src_row.end(), dst_row.begin());
+    std::ranges::copy(src_row, dst_row.begin());
   }
 
   image.header.w = static_cast<int16_t>(neww);

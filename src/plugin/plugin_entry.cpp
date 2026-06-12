@@ -43,7 +43,7 @@ ds::HostVariableCallbacks avisynth_host_variable_callbacks(IScriptEnvironment* e
   if (!env) {
     return {};
   }
-  return ds::HostVariableCallbacks{env, &set_avisynth_host_var};
+  return ds::HostVariableCallbacks{.user = env, .set = &set_avisynth_host_var};
 }
 
 template <class Bridge>
@@ -106,7 +106,7 @@ public:
       PVideoFrame dst = new_output_frame(n, env);
       const auto frame_view = ds::avisynth::make_video_frame_view(dst, input_info_.format);
       std::array<ds::RequestedVideoFrame, 1> frames{
-        ds::RequestedVideoFrame{0, n, frame_view}
+        ds::RequestedVideoFrame{.input_index = 0, .frame_number = n, .frame = frame_view}
       };
       ds::RequestedVideoFrameProvider provider(frames);
 
@@ -185,11 +185,11 @@ AVSValue __cdecl create_avisynth_filter(AVSValue args, void*, IScriptEnvironment
 
     std::array<ds::VideoInputInfo, 1> input_infos{
       ds::VideoInputInfo{
-        vi.width,
-        vi.height,
-        vi.num_frames,
-        format.value(),
-        ds::FrameRate{vi.fps_numerator, vi.fps_denominator}
+        .width = vi.width,
+        .height = vi.height,
+        .num_frames = vi.num_frames,
+        .format = format.value(),
+        .fps = ds::FrameRate{.numerator = vi.fps_numerator, .denominator = vi.fps_denominator}
       }
     };
 

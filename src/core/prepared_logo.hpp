@@ -17,13 +17,13 @@ class LogoPlaneCoefficients {
 public:
   void reset(int width, int height);
 
-  bool active() const noexcept;
-  int width() const noexcept;
-  int height() const noexcept;
+  [[nodiscard]] bool active() const noexcept;
+  [[nodiscard]] int width() const noexcept;
+  [[nodiscard]] int height() const noexcept;
   std::span<int> c_row(int y) noexcept;
   std::span<int> d_row(int y) noexcept;
-  std::span<const int> c_row(int y) const noexcept;
-  std::span<const int> d_row(int y) const noexcept;
+  [[nodiscard]] std::span<const int> c_row(int y) const noexcept;
+  [[nodiscard]] std::span<const int> d_row(int y) const noexcept;
 
 private:
   int width_ = 0;
@@ -36,12 +36,12 @@ class PreparedLogo {
 public:
   explicit PreparedLogo(const DelogoProcessorConfig& config);
 
-  bool active() const noexcept;
-  const LOGO_HEADER& source_header() const noexcept;
-  const LOGO_HEADER& logo_header() const noexcept;
-  const LogoPlaneCoefficients& plane(int index) const noexcept;
-  int subsampling_w() const noexcept;
-  int subsampling_h() const noexcept;
+  [[nodiscard]] bool active() const noexcept;
+  [[nodiscard]] const LOGO_HEADER& source_header() const noexcept;
+  [[nodiscard]] const LOGO_HEADER& logo_header() const noexcept;
+  [[nodiscard]] const LogoPlaneCoefficients& plane(int index) const noexcept;
+  [[nodiscard]] int subsampling_w() const noexcept;
+  [[nodiscard]] int subsampling_h() const noexcept;
 
 private:
   void convert(LogoImage& image, bool mono);

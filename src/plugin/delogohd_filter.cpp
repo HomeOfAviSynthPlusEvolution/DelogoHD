@@ -13,7 +13,7 @@ namespace delogohd {
 namespace {
 
 ds::Error invalid_argument(std::string message) {
-  return ds::Error{ds::ErrorCode::InvalidArgument, std::move(message)};
+  return ds::Error{.code = ds::ErrorCode::InvalidArgument, .message = std::move(message)};
 }
 
 const ds::ParamEntry* find_param(const ds::ParamValues& params, const std::string& name) {
@@ -182,20 +182,25 @@ bool is_supported_subsampling(int subsampling_w, int subsampling_h) {
 
 ds::FilterDescriptor make_descriptor(std::string name) {
   return ds::FilterDescriptor{
-    std::move(name),
-    std::vector<ds::ParamSpec>{
-      ds::ParamSpec{"clip", ds::ParamType::Clip, ds::ParamValue{}, true},
-      ds::ParamSpec{"logofile", ds::ParamType::String},
-      ds::ParamSpec{"logoname", ds::ParamType::String},
-      ds::ParamSpec{"left", ds::ParamType::Integer},
-      ds::ParamSpec{"top", ds::ParamType::Integer},
-      ds::ParamSpec{"start", ds::ParamType::Integer},
-      ds::ParamSpec{"end", ds::ParamType::Integer},
-      ds::ParamSpec{"fadein", ds::ParamType::Integer},
-      ds::ParamSpec{"fadeout", ds::ParamType::Integer},
-      ds::ParamSpec{"mono", ds::ParamType::Boolean},
-      ds::ParamSpec{"cutoff", ds::ParamType::Integer},
-      ds::ParamSpec{"opt", ds::ParamType::Integer}
+    .name = std::move(name),
+    .params = std::vector<ds::ParamSpec>{
+      ds::ParamSpec{
+        .name = "clip",
+        .type = ds::ParamType::Clip,
+        .default_value = ds::ParamValue{},
+        .required = true
+      },
+      ds::ParamSpec{.name = "logofile", .type = ds::ParamType::String},
+      ds::ParamSpec{.name = "logoname", .type = ds::ParamType::String},
+      ds::ParamSpec{.name = "left", .type = ds::ParamType::Integer},
+      ds::ParamSpec{.name = "top", .type = ds::ParamType::Integer},
+      ds::ParamSpec{.name = "start", .type = ds::ParamType::Integer},
+      ds::ParamSpec{.name = "end", .type = ds::ParamType::Integer},
+      ds::ParamSpec{.name = "fadein", .type = ds::ParamType::Integer},
+      ds::ParamSpec{.name = "fadeout", .type = ds::ParamType::Integer},
+      ds::ParamSpec{.name = "mono", .type = ds::ParamType::Boolean},
+      ds::ParamSpec{.name = "cutoff", .type = ds::ParamType::Integer},
+      ds::ParamSpec{.name = "opt", .type = ds::ParamType::Integer}
     }
   };
 }
@@ -251,7 +256,13 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
 
     return ds::Result<ds::VideoInitStateResult<State>>::success(
       ds::VideoInitStateResult<State>{
-        ds::VideoOutputInfo{input.width, input.height, input.num_frames, input.format, input.fps},
+        ds::VideoOutputInfo{
+          .width = input.width,
+          .height = input.height,
+          .num_frames = input.num_frames,
+          .format = input.format,
+          .fps = input.fps
+        },
         State{std::move(processor), parsed.timeline}
       }
     );
@@ -272,7 +283,7 @@ ds::Result<ds::VideoRequestResult> LogoCore<Operation>::request(ds::VideoRequest
 template <core::LogoOperation Operation>
 ds::Result<ds::VideoProcessResult> LogoCore<Operation>::process(ds::VideoProcessContext& context) {
   try {
-    State& state = context.state<State>();
+    auto& state = context.state<State>();
     const Parameters& params = state.params;
     if (context.output_frame < params.start || context.output_frame > params.end) {
       return ds::Result<ds::VideoProcessResult>::success(ds::VideoProcessResult{});

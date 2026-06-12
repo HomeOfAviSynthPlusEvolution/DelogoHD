@@ -34,7 +34,7 @@ class DelogoProcessor {
 public:
   explicit DelogoProcessor(const DelogoProcessorConfig& config);
 
-  const LOGO_HEADER& source_header() const noexcept;
+  [[nodiscard]] const LOGO_HEADER& source_header() const noexcept;
 
   void process(ds::MutableVideoFrameView& frame, double opacity);
 

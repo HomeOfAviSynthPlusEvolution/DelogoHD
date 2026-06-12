@@ -350,7 +350,7 @@ void write_frame_data(
   for (std::size_t i = 0; i < planes.size(); ++i) {
     const auto& [plane, name] = planes[i];
     meta << "    {"
-         << "\"name\": \"" << name << "\", "
+         << R"("name": ")" << name << "\", "
          << "\"row_bytes\": " << frame->GetRowSize(plane) << ", "
          << "\"height\": " << frame->GetHeight(plane) << ", "
          << "\"stride\": " << frame->GetPitch(plane) << "}";
