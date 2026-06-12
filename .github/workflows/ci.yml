@@ -41,6 +41,11 @@ jobs:
             arch: ARM64
             artifact_name: delogohd-windows-arm64
             artifact: build/ci/Release/DelogoHD.dll
+          - name: macos-26-arm64
+            runner: macos-26
+            platform: macos
+            artifact_name: delogohd-macos-26-arm64
+            artifact: build/ci/libDelogoHD.dylib
 
     steps:
       - name: Checkout
@@ -80,6 +85,18 @@ jobs:
       - name: Build
         if: matrix.platform == 'windows'
         run: cmake --build build/ci --config Release --parallel 4
+
+      - name: Configure macOS
+        if: matrix.platform == 'macos'
+        run: >
+          cmake -S . -B build/ci
+          -DCMAKE_BUILD_TYPE=Release
+          -DDELOGOHD_BUILD_TEST_TOOLS=OFF
+          -DDELOGOHD_COPY_RELEASE=OFF
+
+      - name: Build macOS
+        if: matrix.platform == 'macos'
+        run: cmake --build build/ci --parallel 4
 
       - name: Upload plugin
         uses: actions/upload-artifact@v7

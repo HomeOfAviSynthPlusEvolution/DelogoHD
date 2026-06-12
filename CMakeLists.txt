@@ -197,8 +197,8 @@ target_include_directories(DelogoHD
 
 target_link_libraries(DelogoHD PRIVATE hwy delogohd_avisynth_headers delogohd_vapoursynth_headers)
 
-if(NOT WIN32)
-  target_link_libraries(DelogoHD PRIVATE dl)
+if(CMAKE_DL_LIBS)
+  target_link_libraries(DelogoHD PRIVATE ${CMAKE_DL_LIBS})
 endif()
 target_link_libraries(DelogoHD PRIVATE DualSynth::dualsynth)
 
