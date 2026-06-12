@@ -13,4 +13,5 @@ Checks: >
   -readability-avoid-const-params-in-decls
 
 WarningsAsErrors: ''
-HeaderFilterRegex: 'src/.*'
+HeaderFilterRegex: '(^|.*/)src/.*'
+ExcludeHeaderFilterRegex: 'src/core/logo\.h'

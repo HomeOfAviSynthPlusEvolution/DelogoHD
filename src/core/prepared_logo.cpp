@@ -36,15 +36,21 @@ std::optional<LogoImage> shift_logo(LogoImage image, int left, int top) {
   if (oldl < 0) {
     newl = 0;
     padl = oldl;
-  } else if ((padl = oldl % kMinModulo) != 0) {
-    newl = oldl - padl;
+  } else {
+    padl = oldl % kMinModulo;
+    if (padl != 0) {
+      newl = oldl - padl;
+    }
   }
 
   if (oldt < 0) {
     newt = 0;
     padt = oldt;
-  } else if ((padt = oldt % 2) != 0) {
-    newt = oldt - padt;
+  } else {
+    padt = oldt % 2;
+    if (padt != 0) {
+      newt = oldt - padt;
+    }
   }
 
   neww += padl;
@@ -216,7 +222,7 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
         pixel.dp_cb = 0;
         pixel.dp_cr = 0;
       }
-      pixel.dp_y = clamp_logo_depth(pixel.dp_y);
+      pixel.dp_y = static_cast<int16_t>(clamp_logo_depth(pixel.dp_y));
       y_c[x] = luma_to_internal_color(pixel.y);
       y_d[x] = pixel.dp_y;
       if (mono) {

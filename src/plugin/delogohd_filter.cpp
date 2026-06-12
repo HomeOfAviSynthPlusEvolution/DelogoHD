@@ -60,7 +60,8 @@ ds::Result<ParsedInitParameters<Parameters>> parse_init_parameters(
   if (!logofile.has_value()) {
     return ds::Result<ParsedInitParameters<Parameters>>::failure(logofile.error());
   }
-  if (!logofile.value().has_value()) {
+  auto parsed_logofile = std::move(logofile.value());
+  if (!parsed_logofile.has_value()) {
     return ds::Result<ParsedInitParameters<Parameters>>::failure(
       invalid_argument("where's the logo file?")
     );
@@ -99,7 +100,7 @@ ds::Result<ParsedInitParameters<Parameters>> parse_init_parameters(
   parsed.timeline.fadein = fadein.value();
   parsed.timeline.fadeout = fadeout.value();
   parsed.timeline.opt = opt.value();
-  parsed.logofile = std::move(logofile.value().value());
+  parsed.logofile = std::move(*parsed_logofile);
   parsed.logoname = std::move(logoname.value());
   parsed.mono = mono.value();
   parsed.cutoff = cutoff.value();

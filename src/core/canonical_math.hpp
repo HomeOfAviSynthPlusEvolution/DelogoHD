@@ -3,6 +3,7 @@
 #include "core/logo.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 
 namespace delogohd::core {
@@ -45,7 +46,7 @@ inline int internal_to_sample(std::int64_t value, int bit_depth) noexcept {
 }
 
 inline int scaled_depth(int depth, double opacity) noexcept {
-  return clamp_logo_depth(static_cast<int>(depth * opacity + 0.5));
+  return clamp_logo_depth(static_cast<int>(std::lround(depth * opacity)));
 }
 
 inline int apply_add_alpha(
