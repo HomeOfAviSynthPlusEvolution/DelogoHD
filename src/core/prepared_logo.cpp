@@ -104,8 +104,8 @@ std::optional<LogoImage> shift_logo(LogoImage image, int left, int top) {
   auto src_pixels = std::span{image.pixels};
   auto dst_pixels = std::span{shifted};
   for (int y = 0; y < len_v; ++y) {
-    const auto src_offset = src_h + static_cast<std::size_t>(y + src_v) * image.header.w;
-    const auto dst_offset = dst_h + static_cast<std::size_t>(y + dst_v) * neww;
+    const auto src_offset = src_h + (static_cast<std::size_t>(y + src_v) * image.header.w);
+    const auto dst_offset = dst_h + (static_cast<std::size_t>(y + dst_v) * neww);
     auto src_row = src_pixels.subspan(src_offset, static_cast<std::size_t>(len_h));
     auto dst_row = dst_pixels.subspan(dst_offset, static_cast<std::size_t>(len_h));
     std::ranges::copy(src_row, dst_row.begin());
@@ -215,7 +215,7 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
     auto y_c = planes_[0].c_row(y);
     auto y_d = planes_[0].d_row(y);
     for (int x = 0; x < logo_header_.w; ++x) {
-      const auto index = static_cast<std::size_t>(y) * logo_header_.w + x;
+      const auto index = (static_cast<std::size_t>(y) * logo_header_.w) + x;
       LOGO_PIXEL& pixel = image.pixels[index];
       if (pixel.dp_y < cutoff_) {
         pixel.dp_y = 0;
@@ -261,7 +261,7 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
       for (int by = 0; by < hstep; ++by) {
         for (int bx = 0; bx < wstep; ++bx) {
           const LOGO_PIXEL& pixel =
-            image.pixels[static_cast<std::size_t>(y + by) * logo_header_.w + x + bx];
+            image.pixels[(static_cast<std::size_t>(y + by) * logo_header_.w) + x + bx];
           const int sample_ud = clamp_logo_depth(pixel.dp_cb);
           const int sample_vd = clamp_logo_depth(pixel.dp_cr);
           ud += sample_ud;

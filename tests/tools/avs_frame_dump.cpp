@@ -62,15 +62,15 @@ public:
     DynamicLibrary library;
 #if defined(_WIN32)
     library.handle_ = LoadLibraryA(path.c_str());
-    if (!library.handle_) {
+    if (library.handle_ == nullptr) {
       throw std::runtime_error("failed to load " + path);
     }
 #else
     library.handle_ = dlopen(path.c_str(), RTLD_NOW | RTLD_LOCAL);
-    if (!library.handle_) {
+    if (library.handle_ == nullptr) {
       const char* error = dlerror();
       throw std::runtime_error(
-        "failed to load " + path + ": " + (error ? error : "unknown dlopen error")
+        "failed to load " + path + ": " + (error != nullptr ? error : "unknown dlopen error")
       );
     }
 #endif
@@ -85,13 +85,14 @@ public:
     dlerror();
     auto* pointer = reinterpret_cast<Function>(dlsym(handle_, name));
 #endif
-    if (!pointer) {
+    if (pointer == nullptr) {
 #if defined(_WIN32)
       throw std::runtime_error(std::string{"failed to load symbol "} + name);
 #else
       const char* error = dlerror();
       throw std::runtime_error(
-        std::string{"failed to load symbol "} + name + ": " + (error ? error : "unknown dlsym error")
+        std::string{"failed to load symbol "} + name + ": " +
+        (error != nullptr ? error : "unknown dlsym error")
       );
 #endif
     }
@@ -100,7 +101,7 @@ public:
 
 private:
   void close() {
-    if (!handle_) {
+    if (handle_ == nullptr) {
       return;
     }
 #if defined(_WIN32)
@@ -153,40 +154,29 @@ std::pair<std::string, int> parse_expected_int_var(std::string_view text) {
   return {std::move(name), value};
 }
 
+std::string_view require_next_arg(int& index, int argc, char** argv) {
+  if (++index >= argc) {
+    throw_usage();
+  }
+  return argv[index];
+}
+
 Options parse_args(int argc, char** argv) {
   Options options;
   for (int i = 1; i < argc; ++i) {
     const std::string_view arg = argv[i];
     if (arg == "--script") {
-      if (++i >= argc) {
-        throw_usage();
-      }
-      options.script = argv[i];
+      options.script = require_next_arg(i, argc, argv);
     } else if (arg == "--frame") {
-      if (++i >= argc) {
-        throw_usage();
-      }
-      options.frame = parse_int(argv[i], "frame");
+      options.frame = parse_int(require_next_arg(i, argc, argv), "frame");
     } else if (arg == "--raw-out") {
-      if (++i >= argc) {
-        throw_usage();
-      }
-      options.raw_out = argv[i];
+      options.raw_out = require_next_arg(i, argc, argv);
     } else if (arg == "--meta-out") {
-      if (++i >= argc) {
-        throw_usage();
-      }
-      options.meta_out = argv[i];
+      options.meta_out = require_next_arg(i, argc, argv);
     } else if (arg == "--runtime") {
-      if (++i >= argc) {
-        throw_usage();
-      }
-      options.runtime = argv[i];
+      options.runtime = require_next_arg(i, argc, argv);
     } else if (arg == "--expect-int-var") {
-      if (++i >= argc) {
-        throw_usage();
-      }
-      options.expected_int_vars.push_back(parse_expected_int_var(argv[i]));
+      options.expected_int_vars.push_back(parse_expected_int_var(require_next_arg(i, argc, argv)));
     } else {
       throw_usage();
     }
@@ -329,7 +319,7 @@ void write_frame_data(
     const int row_size = frame->GetRowSize(plane);
     const int height = frame->GetHeight(plane);
     for (int y = 0; y < height; ++y) {
-      const BYTE* row = src + static_cast<std::ptrdiff_t>(y) * pitch;
+      const BYTE* row = src + (static_cast<std::ptrdiff_t>(y) * pitch);
       raw.write(reinterpret_cast<const char*>(row), row_size);
     }
   }
@@ -388,7 +378,7 @@ void run_with_environment(const Options& options, CreateScriptEnvironmentFn crea
     AVS_linkage = env->GetAVSLinkage();
     run(options, env);
   } catch (const AvisynthError& error) {
-    const std::string message = error.msg ? error.msg : "unknown AviSynth error";
+    const std::string message = error.msg != nullptr ? error.msg : "unknown AviSynth error";
     env->DeleteScriptEnvironment();
     AVS_linkage = nullptr;
     throw std::runtime_error("AviSynth error: " + message);

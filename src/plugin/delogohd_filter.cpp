@@ -82,15 +82,33 @@ ds::Result<ParsedInitParameters<Parameters>> parse_init_parameters(
   auto mono = params.get_bool("mono", false);
   auto cutoff = params.get_int("cutoff", 0);
 
-  if (!left.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(left.error());
-  if (!top.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(top.error());
-  if (!start.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(start.error());
-  if (!end.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(end.error());
-  if (!fadein.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(fadein.error());
-  if (!fadeout.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(fadeout.error());
-  if (!opt.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(opt.error());
-  if (!mono.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(mono.error());
-  if (!cutoff.has_value()) return ds::Result<ParsedInitParameters<Parameters>>::failure(cutoff.error());
+  if (!left.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(left.error());
+  }
+  if (!top.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(top.error());
+  }
+  if (!start.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(start.error());
+  }
+  if (!end.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(end.error());
+  }
+  if (!fadein.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(fadein.error());
+  }
+  if (!fadeout.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(fadeout.error());
+  }
+  if (!opt.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(opt.error());
+  }
+  if (!mono.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(mono.error());
+  }
+  if (!cutoff.has_value()) {
+    return ds::Result<ParsedInitParameters<Parameters>>::failure(cutoff.error());
+  }
 
   ParsedInitParameters<Parameters> parsed{};
   parsed.timeline.left = left.value();
@@ -136,13 +154,21 @@ ds::Result<bool> set_logo_host_vars(
   const LOGO_HEADER& source_header
 ) {
   auto set_result = context.set_host_var("delogohd_left", source_header.x);
-  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  if (!set_result.has_value()) {
+    return ds::Result<bool>::failure(set_result.error());
+  }
   set_result = context.set_host_var("delogohd_top", source_header.y);
-  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  if (!set_result.has_value()) {
+    return ds::Result<bool>::failure(set_result.error());
+  }
   set_result = context.set_host_var("delogohd_width", source_header.w);
-  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  if (!set_result.has_value()) {
+    return ds::Result<bool>::failure(set_result.error());
+  }
   set_result = context.set_host_var("delogohd_height", source_header.h);
-  if (!set_result.has_value()) return ds::Result<bool>::failure(set_result.error());
+  if (!set_result.has_value()) {
+    return ds::Result<bool>::failure(set_result.error());
+  }
   return ds::Result<bool>::success(true);
 }
 
@@ -237,7 +263,7 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
     }
 
     const ds::ParamValues empty_params{};
-    const ds::ParamValues& params = context.params ? *context.params : empty_params;
+    const ds::ParamValues& params = context.params != nullptr ? *context.params : empty_params;
 
     auto parsed_result = parse_init_parameters<Parameters>(params);
     if (!parsed_result.has_value()) {
@@ -276,7 +302,9 @@ LogoCore<Operation>::init(ds::VideoInitContext& context) {
 }
 
 template <core::LogoOperation Operation>
-ds::Result<ds::VideoRequestResult> LogoCore<Operation>::request(ds::VideoRequestContext&) {
+ds::Result<ds::VideoRequestResult> LogoCore<Operation>::request(
+  ds::VideoRequestContext& /*context*/
+) {
   return ds::Result<ds::VideoRequestResult>::success(ds::VideoRequestResult{});
 }
 

@@ -57,9 +57,9 @@ inline int apply_add_alpha_reciprocal(
   const int alpha = clamp_logo_depth(depth);
   const auto source = sample_to_internal(sample, bit_depth);
   const auto numerator =
-    source * (LOGO_MAX_DP - alpha) +
-    static_cast<std::int64_t>(logo_color) * alpha +
-    LOGO_MAX_DP / 2;
+    (source * (LOGO_MAX_DP - alpha)) +
+    (static_cast<std::int64_t>(logo_color) * alpha) +
+    (LOGO_MAX_DP / 2);
   return internal_to_sample(
     divide_signed_by_reciprocal(numerator, LOGO_MAX_DP),
     bit_depth
@@ -79,9 +79,9 @@ inline int apply_erase_alpha_reciprocal(
   const int remaining = LOGO_MAX_DP - alpha;
   const auto source = sample_to_internal(sample, bit_depth);
   const auto numerator =
-    source * LOGO_MAX_DP -
-    static_cast<std::int64_t>(logo_color) * alpha +
-    remaining / 2;
+    (source * LOGO_MAX_DP) -
+    (static_cast<std::int64_t>(logo_color) * alpha) +
+    (remaining / 2);
   return internal_to_sample(
     divide_signed_by_reciprocal(numerator, remaining),
     bit_depth

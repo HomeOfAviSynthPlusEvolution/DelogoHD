@@ -56,7 +56,7 @@ public:
     const std::size_t aligned_bytes = ((bytes + Alignment - 1) / Alignment) * Alignment;
     data_ = static_cast<T*>(std::aligned_alloc(Alignment, aligned_bytes));
 #endif
-    if (!data_) {
+    if (data_ == nullptr) {
       throw std::runtime_error("unable to allocate memory");
     }
     std::memset(data_, 0, bytes);
@@ -104,7 +104,7 @@ public:
 
 private:
   void release() noexcept {
-    if (!data_) {
+    if (data_ == nullptr) {
       return;
     }
 #if defined(_WIN32)

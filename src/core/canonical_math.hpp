@@ -19,11 +19,11 @@ inline int clamp_logo_depth(int depth) noexcept {
 }
 
 inline int luma_to_internal_color(int color) noexcept {
-  return kLumaOffset + color * kLumaScale;
+  return kLumaOffset + (color * kLumaScale);
 }
 
 inline int chroma_to_internal_color(int color) noexcept {
-  return (kChromaOffset + color * kChromaScale) * kChromaInternalScale;
+  return (kChromaOffset + (color * kChromaScale)) * kChromaInternalScale;
 }
 
 inline int internal_shift_for_depth(int bit_depth) noexcept {

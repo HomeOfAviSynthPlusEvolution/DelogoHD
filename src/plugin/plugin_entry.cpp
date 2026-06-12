@@ -25,7 +25,7 @@ const AVS_Linkage* AVS_linkage = nullptr;
 namespace {
 
 bool set_avisynth_host_var(void* user, const char* name, const ds::ParamValue& value) {
-  if (!user || !name) {
+  if (user == nullptr || name == nullptr) {
     return false;
   }
 
@@ -40,7 +40,7 @@ bool set_avisynth_host_var(void* user, const char* name, const ds::ParamValue& v
 }
 
 ds::HostVariableCallbacks avisynth_host_variable_callbacks(IScriptEnvironment* env) {
-  if (!env) {
+  if (env == nullptr) {
     return {};
   }
   return ds::HostVariableCallbacks{.user = env, .set = &set_avisynth_host_var};
@@ -78,7 +78,7 @@ template <class Bridge>
 void VS_CC create_vapoursynth_filter(
   const VSMap* in,
   VSMap* out,
-  void*,
+  void* /*user_data*/,
   VSCore* core,
   const VSAPI* vsapi
 ) {
@@ -172,8 +172,13 @@ private:
 };
 
 template <class Bridge>
-// NOLINTNEXTLINE(performance-unnecessary-value-param) - AviSynth callback ABI passes AVSValue by value.
-AVSValue __cdecl create_avisynth_filter(AVSValue args, void*, IScriptEnvironment* env) {
+// AviSynth callback ABI passes AVSValue by value.
+// NOLINTBEGIN(performance-unnecessary-value-param)
+AVSValue __cdecl create_avisynth_filter(
+  AVSValue args,
+  void* /*user_data*/,
+  IScriptEnvironment* env
+) {
   using Filter = typename Bridge::Core;
 
   try {
@@ -235,6 +240,7 @@ AVSValue __cdecl create_avisynth_filter(AVSValue args, void*, IScriptEnvironment
 
   return {};
 }
+// NOLINTEND(performance-unnecessary-value-param)
 
 template <class Bridge>
 void register_avisynth_filter(IScriptEnvironment* env, bool register_mt_mode) {
