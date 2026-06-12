@@ -132,17 +132,21 @@ endif()
 delogohd_add_vapoursynth_compat_headers(delogohd_vapoursynth_headers)
 
 find_package(Git)
+set(GIT_REPO_VERSION "unknown-version")
 if(GIT_FOUND)
   execute_process(
     COMMAND ${GIT_EXECUTABLE} describe --first-parent --tags --always
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_REPO_VERSION
+    RESULT_VARIABLE GIT_REPO_VERSION_RESULT
+    ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-else()
-  set(GIT_REPO_VERSION "unknown")
+  if(NOT GIT_REPO_VERSION_RESULT EQUAL 0 OR GIT_REPO_VERSION STREQUAL "")
+    set(GIT_REPO_VERSION "unknown-version")
+  endif()
 endif()
-string(REGEX REPLACE "^(r[0-9]+).*$" "\\1" VERSION "${GIT_REPO_VERSION}")
+string(REGEX REPLACE "^(v[0-9]+(\\.[0-9]+)*).*$" "\\1" VERSION "${GIT_REPO_VERSION}")
 
 set(DELOGOHD_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 configure_file(
