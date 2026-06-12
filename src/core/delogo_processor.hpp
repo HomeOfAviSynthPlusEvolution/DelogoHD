@@ -4,14 +4,16 @@
 
 #include "core/prepared_logo.hpp"
 
+#include <cstdint>
+
 namespace delogohd::core {
 
-enum class LogoOperation {
+enum class LogoOperation : std::uint8_t {
   Add,
   Erase,
 };
 
-enum class RowKernelBackend {
+enum class RowKernelBackend : std::uint8_t {
   Highway,
   Scalar,
 };

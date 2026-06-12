@@ -91,11 +91,11 @@ public:
   using Filter = typename Bridge::Core;
 
   AvisynthCompatVideoFilter(
-    PClip clip,
+    const PClip& clip,
     ds::VideoInputInfo input_info,
     ds::VideoFilterState<Filter> state,
     ds::avisynth::MtMode mt_mode
-  ) : clip_(std::move(clip)),
+  ) : clip_(clip),
       input_info_(input_info),
       state_(std::move(state)),
       mt_mode_(mt_mode),
@@ -172,6 +172,7 @@ private:
 };
 
 template <class Bridge>
+// NOLINTNEXTLINE(performance-unnecessary-value-param) - AviSynth callback ABI passes AVSValue by value.
 AVSValue __cdecl create_avisynth_filter(AVSValue args, void*, IScriptEnvironment* env) {
   using Filter = typename Bridge::Core;
 
