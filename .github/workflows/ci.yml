@@ -17,15 +17,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: linux-x64
+          - name: linux-ubuntu24.04-x64
             runner: ubuntu-24.04
             platform: linux
-            artifact_name: delogohd-linux-x64
+            artifact_name: delogohd-linux-ubuntu24.04-x64
             artifact: build/artifacts/*.deb
-          - name: linux-arm64
+          - name: linux-ubuntu24.04-arm64
             runner: ubuntu-24.04-arm
             platform: linux
-            artifact_name: delogohd-linux-arm64
+            artifact_name: delogohd-linux-ubuntu24.04-arm64
+            artifact: build/artifacts/*.deb
+          - name: linux-ubuntu26.04-x64
+            runner: ubuntu-26.04
+            platform: linux
+            artifact_name: delogohd-linux-ubuntu26.04-x64
+            artifact: build/artifacts/*.deb
+          - name: linux-ubuntu26.04-arm64
+            runner: ubuntu-26.04-arm
+            platform: linux
+            artifact_name: delogohd-linux-ubuntu26.04-arm64
             artifact: build/artifacts/*.deb
           - name: windows-x64
             runner: windows-2025-vs2026
@@ -35,9 +45,9 @@ jobs:
             artifact_name: delogohd-windows-x64
             artifact: build/ci/Release/DelogoHD.dll
           - name: windows-arm64
-            runner: windows-11-arm
+            runner: windows-11-vs2026-arm
             platform: windows
-            generator: Visual Studio 17 2022
+            generator: Visual Studio 18 2026
             arch: ARM64
             artifact_name: delogohd-windows-arm64
             artifact: build/ci/Release/DelogoHD.dll
@@ -68,6 +78,13 @@ jobs:
       - name: Build Debian package
         if: matrix.platform == 'linux'
         run: |
+          . /etc/os-release
+          package_version="$(dpkg-parsechangelog -S Version)"
+          os_suffix="ubuntu${VERSION_ID}"
+          package_version="${package_version}+${os_suffix}"
+          sed -i "1s/([^)]*)/(${package_version})/" debian/changelog
+          dpkg-parsechangelog -S Version
+
           dpkg-buildpackage -us -uc -b -j4
           mkdir -p build/artifacts
           cp ../dualsynth-delogohd_*.deb build/artifacts/
