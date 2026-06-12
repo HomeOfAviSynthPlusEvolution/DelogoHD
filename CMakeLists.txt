@@ -8,12 +8,23 @@ project(DelogoHD CXX)
 
 option(DELOGOHD_BUILD_TEST_TOOLS "Build DelogoHD baseline test tools" ON)
 option(DELOGOHD_COPY_RELEASE "Copy the built plugin to the legacy Release_<version> directory" OFF)
+option(DELOGOHD_ENABLE_CLANG_TIDY "Enable clang-tidy static analysis during compilation" OFF)
 # Pin past v3.7.5 so fallback headers allow Visual Studio ARM64 builds.
 set(DELOGOHD_AVISYNTHPLUS_TAG "751ce2021cab1c8405d04825ac2f7e8ac93e8fa0" CACHE STRING "AviSynthPlus tag used when pkg-config cannot find AviSynth headers")
 set(DELOGOHD_VAPOURSYNTH_TAG "R72" CACHE STRING "VapourSynth tag used when pkg-config cannot find VapourSynth headers")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(DELOGOHD_ENABLE_CLANG_TIDY)
+  find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+  if(CLANG_TIDY_EXE)
+    message(STATUS "Found clang-tidy: ${CLANG_TIDY_EXE}")
+    set(DELOGOHD_CLANG_TIDY "${CLANG_TIDY_EXE};--extra-arg=-Wno-unknown-argument;--extra-arg=-Wno-unused-command-line-argument")
+  else()
+    message(WARNING "clang-tidy requested but not found in PATH")
+  endif()
+endif()
 
 if(MSVC AND NOT CMAKE_MSVC_RUNTIME_LIBRARY)
   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
@@ -186,6 +197,10 @@ if(NOT WIN32)
   target_link_libraries(DelogoHD PRIVATE dl)
 endif()
 target_link_libraries(DelogoHD PRIVATE DualSynth::dualsynth)
+
+if(DELOGOHD_CLANG_TIDY)
+  set_target_properties(DelogoHD PROPERTIES CXX_CLANG_TIDY "${DELOGOHD_CLANG_TIDY}")
+endif()
 
 if(DELOGOHD_COPY_RELEASE AND DEFINED _DIR)
   add_custom_command(
