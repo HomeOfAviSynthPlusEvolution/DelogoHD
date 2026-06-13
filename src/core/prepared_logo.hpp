@@ -4,6 +4,7 @@
 #include "core/logo_file.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <span>
 
 namespace delogohd::core {
@@ -22,14 +23,17 @@ public:
   [[nodiscard]] int height() const noexcept;
   std::span<int> c_row(int y) noexcept;
   std::span<int> d_row(int y) noexcept;
+  std::span<std::uint32_t> d_reciprocal_row(int y) noexcept;
   [[nodiscard]] std::span<const int> c_row(int y) const noexcept;
   [[nodiscard]] std::span<const int> d_row(int y) const noexcept;
+  [[nodiscard]] std::span<const std::uint32_t> d_reciprocal_row(int y) const noexcept;
 
 private:
   int width_ = 0;
   int height_ = 0;
   AlignedBuffer<int, kLogoAlignment> c_;
   AlignedBuffer<int, kLogoAlignment> d_;
+  AlignedBuffer<std::uint32_t, kLogoAlignment> d_reciprocal_;
 };
 
 class PreparedLogo {

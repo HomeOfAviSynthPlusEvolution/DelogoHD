@@ -2,6 +2,7 @@
 
 #include "core/canonical_math.hpp"
 #include "core/delogo_processor.hpp"
+#include "core/reciprocal_math.hpp"
 
 #include <algorithm>
 #include <optional>
@@ -20,6 +21,14 @@ int chroma_color_for_block(std::int64_t weighted_color, int sum_depth) {
     return 0;
   }
   return round_divide_signed(weighted_color, sum_depth);
+}
+
+std::uint32_t erase_reciprocal_for_depth(int depth) {
+  int alpha = clamp_logo_depth(depth);
+  if (alpha >= LOGO_MAX_DP) {
+    alpha = LOGO_MAX_DP - 1;
+  }
+  return kLogoReciprocalTable32[static_cast<std::size_t>(LOGO_MAX_DP - alpha)];
 }
 
 std::optional<LogoImage> shift_logo(LogoImage image, int left, int top) {
@@ -126,10 +135,11 @@ void LogoPlaneCoefficients::reset(int width, int height) {
   height_ = height;
   c_.reset(static_cast<std::size_t>(width_) * height_);
   d_.reset(static_cast<std::size_t>(width_) * height_);
+  d_reciprocal_.reset(static_cast<std::size_t>(width_) * height_);
 }
 
 bool LogoPlaneCoefficients::active() const noexcept {
-  return !c_.empty() && !d_.empty();
+  return !c_.empty() && !d_.empty() && !d_reciprocal_.empty();
 }
 
 int LogoPlaneCoefficients::width() const noexcept {
@@ -154,6 +164,13 @@ std::span<int> LogoPlaneCoefficients::d_row(int y) noexcept {
   );
 }
 
+std::span<std::uint32_t> LogoPlaneCoefficients::d_reciprocal_row(int y) noexcept {
+  return d_reciprocal_.subspan(
+    static_cast<std::size_t>(y) * width_,
+    static_cast<std::size_t>(width_)
+  );
+}
+
 std::span<const int> LogoPlaneCoefficients::c_row(int y) const noexcept {
   return c_.subspan(
     static_cast<std::size_t>(y) * width_,
@@ -163,6 +180,13 @@ std::span<const int> LogoPlaneCoefficients::c_row(int y) const noexcept {
 
 std::span<const int> LogoPlaneCoefficients::d_row(int y) const noexcept {
   return d_.subspan(
+    static_cast<std::size_t>(y) * width_,
+    static_cast<std::size_t>(width_)
+  );
+}
+
+std::span<const std::uint32_t> LogoPlaneCoefficients::d_reciprocal_row(int y) const noexcept {
+  return d_reciprocal_.subspan(
     static_cast<std::size_t>(y) * width_,
     static_cast<std::size_t>(width_)
   );
@@ -214,6 +238,7 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
   for (int y = 0; y < logo_header_.h; ++y) {
     auto y_c = planes_[0].c_row(y);
     auto y_d = planes_[0].d_row(y);
+    auto y_d_reciprocal = planes_[0].d_reciprocal_row(y);
     for (int x = 0; x < logo_header_.w; ++x) {
       const auto index = (static_cast<std::size_t>(y) * logo_header_.w) + x;
       LOGO_PIXEL& pixel = image.pixels[index];
@@ -225,6 +250,7 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
       pixel.dp_y = static_cast<int16_t>(clamp_logo_depth(pixel.dp_y));
       y_c[x] = luma_to_internal_color(pixel.y);
       y_d[x] = pixel.dp_y;
+      y_d_reciprocal[x] = erase_reciprocal_for_depth(pixel.dp_y);
       if (mono) {
         pixel.cb = 0;
         pixel.cr = 0;
@@ -245,8 +271,10 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
     const int dst_y = y / hstep;
     auto u_c_row = planes_[1].c_row(dst_y);
     auto u_d_row = planes_[1].d_row(dst_y);
+    auto u_d_reciprocal_row = planes_[1].d_reciprocal_row(dst_y);
     auto v_c_row = planes_[2].c_row(dst_y);
     auto v_d_row = planes_[2].d_row(dst_y);
+    auto v_d_reciprocal_row = planes_[2].d_reciprocal_row(dst_y);
 
     for (int x = 0; x < logo_header_.w; x += wstep) {
       const int dst_x = x / wstep;
@@ -281,6 +309,8 @@ void PreparedLogo::convert(LogoImage& image, bool mono) {
       v_c_row[dst_x] = chroma_to_internal_color(vc);
       u_d_row[dst_x] = ud;
       v_d_row[dst_x] = vd;
+      u_d_reciprocal_row[dst_x] = erase_reciprocal_for_depth(ud);
+      v_d_reciprocal_row[dst_x] = erase_reciprocal_for_depth(vd);
     }
   }
 }

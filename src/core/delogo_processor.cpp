@@ -61,6 +61,7 @@ void process_opaque_row(
   std::span<Pixel> row,
   std::span<const int> colors,
   std::span<const int> depths,
+  std::span<const std::uint32_t> erase_reciprocals,
   int bit_depth
 ) {
   if (backend == RowKernelBackend::Scalar) {
@@ -75,7 +76,7 @@ void process_opaque_row(
   if (operation == LogoOperation::Add) {
     process_add_row_hwy(row, colors, depths, bit_depth);
   } else {
-    process_erase_row_hwy(row, colors, depths, bit_depth);
+    process_erase_row_hwy(row, colors, depths, erase_reciprocals, bit_depth);
   }
 }
 
@@ -187,6 +188,7 @@ void DelogoProcessor::process_plane(
       row,
       coefficients.c_row(i).first(row_width),
       coefficients.d_row(i).first(row_width),
+      coefficients.d_reciprocal_row(i).first(row_width),
       bit_depth_
     );
   }

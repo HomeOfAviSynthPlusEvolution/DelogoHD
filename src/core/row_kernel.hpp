@@ -46,12 +46,14 @@ void process_erase_row_hwy(
   std::span<std::uint8_t> row,
   std::span<const int> colors,
   std::span<const int> depths,
+  std::span<const std::uint32_t> reciprocals,
   int bit_depth
 );
 void process_erase_row_hwy(
   std::span<std::uint16_t> row,
   std::span<const int> colors,
   std::span<const int> depths,
+  std::span<const std::uint32_t> reciprocals,
   int bit_depth
 );
 

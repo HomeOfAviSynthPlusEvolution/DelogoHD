@@ -21,6 +21,20 @@ constexpr std::array<std::uint64_t, LOGO_MAX_DP + 1> make_logo_reciprocal_table(
 
 inline constexpr auto kLogoReciprocalTable = make_logo_reciprocal_table();
 
+constexpr std::array<std::uint32_t, LOGO_MAX_DP + 1> make_logo_reciprocal_table32() noexcept {
+  std::array<std::uint32_t, LOGO_MAX_DP + 1> table{};
+  // 1 << 32 does not fit in u32; the correction step still yields exact / 1.
+  table[1] = 0xFFFFFFFFu;
+  for (int denominator = 2; denominator <= LOGO_MAX_DP; ++denominator) {
+    table[denominator] = static_cast<std::uint32_t>(
+      kReciprocalScale / static_cast<std::uint64_t>(denominator)
+    );
+  }
+  return table;
+}
+
+inline constexpr auto kLogoReciprocalTable32 = make_logo_reciprocal_table32();
+
 inline std::uint64_t divide_floor_by_reciprocal(
   std::uint64_t numerator,
   int denominator
